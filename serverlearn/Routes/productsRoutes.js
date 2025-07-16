@@ -16,7 +16,7 @@ router.get("/products", readproducts);
 router.get(
   "/products/:id",
   [param("id").isMongoId().withMessage("ID สินค้าไม่ถูกต้อง")],
-  authCheck,
+  // authCheck,
   readproductById
 );
 
@@ -49,6 +49,12 @@ router.post(
       .trim()
       .notEmpty()
       .withMessage("รายละเอียดสินค้าห้ามว่างเปล่า"),
+    body("sizes")
+      .isArray({ min: 1 })
+      .withMessage("กรุณาระบุไซส์อย่างน้อย 1 ไซส์"),
+    body("sizes.*").isString().withMessage("ไซส์ต้องเป็นตัวเลขหรือข้อความ"),
+    body("colors").isArray({ min: 1 }).withMessage("กรุณาระบุสีอย่างน้อย 1 สี"),
+    body("colors.*").isString().withMessage("ชื่อสีต้องเป็นข้อความ"),
     body("images")
       .isArray({ min: 1 })
       .withMessage("ต้องมีรูปภาพอย่างน้อย 1 รูป") // images array ต้องไม่ว่างเปล่าสำหรับ create
@@ -108,11 +114,17 @@ router.put(
       .trim()
       .notEmpty()
       .withMessage("รายละเอียดสินค้าห้ามว่างเปล่า"),
+    body("sizes")
+      .isArray({ min: 1 })
+      .withMessage("กรุณาระบุไซส์อย่างน้อย 1 ไซส์"),
+    body("sizes.*").isNumeric().withMessage("ไซส์ต้องเป็นตัวเลข"),
+    body("colors").isArray({ min: 1 }).withMessage("กรุณาระบุสีอย่างน้อย 1 สี"),
+    body("colors.*").isString().withMessage("ชื่อสีต้องเป็นข้อความ"),
     body("images")
       .isArray({ min: 1 })
       .withMessage("ต้องมีรูปภาพอย่างน้อย 1 รูป") // images array ต้องไม่ว่างเปล่าสำหรับ create
       .custom((images) => {
-        if (!Array.isArray(images)) { 
+        if (!Array.isArray(images)) {
           throw new Error("รูปภาพต้องเป็นอาร์เรย์"); // ควรถูกดักด้วย isArray ก่อนหน้านี้แล้ว
         }
         if (images.length > 10) {

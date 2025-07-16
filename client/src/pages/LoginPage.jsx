@@ -32,10 +32,10 @@ const LoginPage = () => {
   // }
 
   return (
-    <div className="container mx-auto my-auto max-w-3xl">
+    <div className="flex justify-center mt-30">
       <form
         onSubmit={handleSubmit}
-        className="mb-4 rounded-2xl bg-white py-20 shadow-md"
+        className="mb-4 rounded-2xl bg-white py-20 shadow-md p-10"
       >
         <h1 className="text-center text-2xl font-semibold">ล็อกอิน</h1>
         <div className="mx-auto mt-6 max-w-md">
@@ -64,7 +64,7 @@ const LoginPage = () => {
           <div className="mx-auto mt-6 max-w-md text-center">
             <button
               type="submit"
-              className="cursor-pointer rounded-xl bg-green-400 p-2.5 text-center hover:bg-green-500 disabled:opacity-50"
+              className="cursor-pointer rounded-xl bg-blue-400 p-2.5 text-center hover:bg-blue-500 disabled:opacity-50"
               disabled={localLoading} // ปิดปุ่มตอนโหลด
             >
               {localLoading ? (

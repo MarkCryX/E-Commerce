@@ -21,6 +21,14 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    sizes: {
+      type: [String], // เช่น [38, 39, 40, 41, 42]
+      required: true,
+    },
+    colors: {
+      type: [String], // เช่น ["black", "white", "red"]
+      required: true,
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category' ,

@@ -1,33 +1,35 @@
 // src/pages/ProfilePage.jsx
-import { useAuth } from '../../context/AuthContext';
-import { useEffect } from 'react'; // Don't forget to import useEffect if you use it
+import { useAuth } from "../../context/AuthContext";
+import { useEffect } from "react"; // Don't forget to import useEffect if you use it
 
 const ProfilePage = () => {
-  const { user, loading, isAuthenticated } = useAuth(); // Destructure user, loading, isAuthenticated
-  
+  const { user, loading } = useAuth(); // Destructure user, loading, isAuthenticated
+
   if (loading) {
     return <div>Loading profile...</div>; // Show loading state
   }
 
-  if (!isAuthenticated) {
-    // This case should ideally be handled by PrivateRoute, but good for defensive coding
-    return <div>You are not logged in.</div>;
-  }
+
 
   // Render user data
   return (
-    <div className="container mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Your Profile</h1>
+    <div className="container mx-auto my-8 rounded-lg bg-white p-6 shadow-md">
+      <h1 className="mb-6 text-center text-3xl font-bold">Your Profile</h1>
       {user ? (
         <div className="space-y-4">
-
-          <p className="text-lg"><strong>Username:</strong> {user.username}</p>
-          <p className="text-lg"><strong>Email:</strong> {user.email}</p>
-          <p className="text-lg"><strong>Role:</strong> {user.role}</p>
-          <img 
-          src={user.profileImage} 
-          alt="profile" 
-          className='w-19 h-19 object-fill rounded-full border-2 border-gray-400'
+          <p className="text-lg">
+            <strong>Username:</strong> {user.username}
+          </p>
+          <p className="text-lg">
+            <strong>Email:</strong> {user.email}
+          </p>
+          <p className="text-lg">
+            <strong>Role:</strong> {user.role}
+          </p>
+          <img
+            src={user.profileImage}
+            alt="profile"
+            className="h-19 w-19 rounded-full border-2 border-gray-400 object-fill"
           />
         </div>
       ) : (

@@ -18,13 +18,15 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
   const [uploadProgress, setUploadProgress] = useState({}); // เก็บ progress ของแต่ละไฟล์ เช่น { "file1.jpg": 50, "file2.png": 80 }
   const navigate = useNavigate();
 
-
-  
   const [form, setForm] = useState({
     name: "",
     price: "",
     quantity: 1,
     description: "",
+    sizes: [],
+    colors: [],
+    sizesString: "", // เพิ่ม field ใหม่
+    colorsString: "", // เพิ่ม field ใหม่
     category: "",
     images: [],
   });
@@ -144,6 +146,8 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
       !form.price ||
       !form.quantity ||
       !form.category ||
+      form.sizes.length === 0 ||
+      form.colors.length === 0 ||
       !form.description.trim() ||
       form.images.length === 0
     ) {
@@ -162,7 +166,7 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
     try {
       let response;
       const productDataToSubmit = { ...form };
-      
+
       if (mode === "create") {
         response = await createProduct(productDataToSubmit);
       } else if (mode === "edit" && productData) {
@@ -173,7 +177,7 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
       } else {
         throw new Error("Invalid mode for product form.");
       }
-      
+
       toast.success(response || "ดำเนินการสำเร็จ!");
       if (onSuccess) onSuccess();
       if (closemodal) closemodal();
@@ -196,6 +200,10 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
         price: productData.price || "",
         quantity: productData.quantity || 1,
         description: productData.description || "",
+        sizes: productData.sizes || [],
+        colors: productData.colors || [],
+        sizesString: productData.sizes ? productData.sizes.join(", ") : "", // ตั้งค่าเริ่มต้น
+        colorsString: productData.colors ? productData.colors.join(", ") : "", // ตั้งค่าเริ่มต้น
         category: productData.category._id || "",
         images: productData.images || [],
       });
@@ -205,6 +213,8 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
         price: "",
         quantity: 1,
         description: "",
+        sizes: [],
+        colors: [],
         category: "",
         images: [],
       });
@@ -215,7 +225,6 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
   useEffect(() => {
     fetchCategories();
   }, []);
-
 
   // นับจำนวนไฟล์ที่กำลังอัปโหลด
   const uploadingFileCount = Object.keys(uploadProgress).length;
@@ -300,19 +309,11 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
                     เลือกหมวดหมู่
                   </option>
                   {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>{cat.name}</option>
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
                   ))}
                 </select>
-
-                {/* <input
-                  type="text"
-                  id="category"
-                  name="category"
-                  required
-                  className="w-full rounded-md border border-gray-200 p-2"
-                  value={form.category}
-                  onChange={handleChange}
-                /> */}
               </div>
               <div className="mb-6">
                 <label
@@ -354,7 +355,64 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
                   </div>
                 )}
               </div>
+              <div>
+                <label
+                  htmlFor="sizes"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  ไซส์ (คั่นด้วยเครื่องหมายจุลภาค เช่น 38,39,40)
+                </label>
+                <input
+                  type="text"
+                  id="sizes"
+                  name="sizes"
+                  className="w-full rounded-md border border-gray-200 p-2"
+                  value={form.sizesString || ""}
+                  onChange={(e) => {
+                    const sizesString = e.target.value;
+                    const sizesArray = sizesString
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter((s) => s !== "");
+
+                    setForm((prev) => ({
+                      ...prev,
+                      sizes: sizesArray,
+                      sizesString: sizesString, // เก็บค่า string ไว้ด้วย
+                    }));
+                  }}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="colors"
+                  className="mb-2 block text-sm font-medium text-gray-700"
+                >
+                  สี (คั่นด้วยเครื่องหมายจุลภาค เช่น ดำ,ขาว)
+                </label>
+                <input
+                  type="text"
+                  id="colors"
+                  name="colors"
+                  className="w-full rounded-md border border-gray-200 p-2"
+                  value={form.colorsString || ""}
+                  onChange={(e) => {
+                    const colorsString = e.target.value;
+                    const colorsArray = colorsString
+                      .split(",")
+                      .map((color) => color.trim())
+                      .filter((color) => color !== "");
+
+                    setForm((prev) => ({
+                      ...prev,
+                      colors: colorsArray,
+                      colorsString: colorsString, // เก็บค่า string ไว้ด้วย
+                    }));
+                  }}
+                />
+              </div>
             </div>
+
             <div>
               <label
                 htmlFor="description"

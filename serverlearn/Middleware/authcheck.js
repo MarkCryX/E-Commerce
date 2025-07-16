@@ -1,37 +1,87 @@
 // Middleware/authcheck.js
 const jwt = require("jsonwebtoken");
+const User = require("../Models/User");
 
-exports.authCheck = (req, res, next) => {
-  const accessToken = req.cookies.accessToken;
-
-  if (!accessToken) {
-    return res.status(401).json({ message: "Unauthorized: Invalid token" });
-  }
-
+exports.authCheck = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    console.error("Access Token verification failed:", err); // เปลี่ยน 'Token' เป็น 'Access Token'
-    
-    // ถ้า Access Token หมดอายุ ควรส่ง 401 เพื่อให้ Frontend ไปเรียก Refresh Token
-    if (err.name === "TokenExpiredError") {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: Access Token expired", expired: true });
+    // 1. ดึง Token จาก Cookies
+    const accessToken = req.cookies.accessToken;
+    const refreshToken = req.cookies.refreshToken;
+
+    // 2. ตรวจสอบว่ามี Access Token หรือไม่
+    if (!accessToken) {
+      // 2.1. ถ้าไม่มี Access Token แต่มี Refresh Token
+      if (refreshToken) {
+        return res.status(401).json({
+          isAuthenticated: false,
+          shouldRefresh: true,
+          message: "Access token missing, please refresh",
+        });
+      }
+      // 2.2. ถ้าไม่มีทั้ง Access Token และ Refresh Token
+      return res.status(401).json({
+        isAuthenticated: false,
+        message: "ไม่พบ token การเข้าสู่ระบบ",
+      });
     }
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: Invalid Access Token" }); // เปลี่ยนเป็น 401 เพื่อให้ Interceptor ทำงาน
+
+    // 3. ตรวจสอบ Access Token
+    try {
+      // 3.1. ถอดรหัส (Verify) Access Token
+      const decoded = jwt.verify(accessToken, process.env.JWT_SECRET); // ใช้ JWT_SECRET ในการถอดรหัส
+      // `decoded` จะมีข้อมูลที่ถูกเก็บไว้ใน token เช่น userId
+
+      // 3.2. ค้นหาข้อมูลผู้ใช้จากฐานข้อมูล
+      const user = await User.findById(decoded.userId).select(
+        "-password -refreshToken"
+      ); // ดึงข้อมูลผู้ใช้ ยกเว้น password และ refreshToken
+
+      // 3.3. ตรวจสอบว่าพบผู้ใช้หรือไม่
+      if (!user) {
+        return res.status(401).json({
+          isAuthenticated: false,
+          message: "ไม่พบผู้ใช้",
+        });
+      }
+
+      // 3.4. เพิ่มข้อมูลผู้ใช้ใน Object `req`
+      req.user = user;
+      next();
+    } catch (tokenError) {
+      // 4. จัดการข้อผิดพลาดในการตรวจสอบ Access Token
+      // 4.1. ถ้า Access Token หมดอายุหรือไม่ถูกต้อง และมี Refresh Token
+      if (refreshToken) {
+        // แนะนำให้ทำการ Refresh Token
+        return res.status(401).json({
+          isAuthenticated: false,
+          shouldRefresh: true,
+          message: "Access token expired, please refresh",
+        });
+      }
+
+      // 4.2. ถ้า Access Token หมดอายุหรือไม่ถูกต้อง และไม่มี Refresh Token
+      return res.status(401).json({
+        isAuthenticated: false,
+        message: "Token ไม่ถูกต้อง",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      isAuthenticated: false,
+      message: "เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์",
+    });
   }
 };
 
 exports.isAdmin = (req, res, next) => {
+  // 1. ตรวจสอบว่ามีข้อมูลผู้ใช้ใน req (จาก authCheck) และบทบาทเป็น "admin"
   if (req.user && req.user.role === "admin") {
     next();
   } else {
-    console.error("Access denied: Admin role required");
-    return res.status(403).json({ message: "Forbidden: Admin role required." });
+    // 2. ถ้าไม่ใช่ admin
+    return res.status(403).json({
+      message: "Admin access required",
+      shouldRefresh: false,
+    });
   }
 };

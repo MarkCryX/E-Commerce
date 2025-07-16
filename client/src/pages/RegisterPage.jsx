@@ -61,10 +61,10 @@ const RegisterPage = () => {
   }, [isAuthenticated, loading, navigate]);
 
   return (
-    <div className="container mx-auto my-auto">
+    <div className="flex justify-center mt-20">
       <form
         onSubmit={handleSubmit}
-        className="mb-4 rounded-2xl bg-white py-20 shadow-md"
+        className="mb-4 rounded-2xl bg-white p-10 py-20 shadow-md"
       >
         <h1 className="text-center text-2xl font-semibold">สมัครสมาชิก</h1>
         <div className="mx-auto mt-6 max-w-md">
@@ -80,7 +80,7 @@ const RegisterPage = () => {
             maxLength={30}
             minLength={3}
             onChange={(e) => setUsername(e.target.value)}
-            autocomplete="username"
+            // autocomplete="username"
           />
           {error &&
             error
@@ -107,7 +107,7 @@ const RegisterPage = () => {
                 prev ? prev.filter((item) => item.path !== "email") : null,
               );
             }}
-            autoComplete="email"
+            // autoComplete="email"
           />
           {error &&
             error
@@ -136,7 +136,7 @@ const RegisterPage = () => {
             minLength={3}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete="password"
+            // autoComplete="password"
           />
           {error &&
             error
@@ -159,7 +159,7 @@ const RegisterPage = () => {
             minLength={3}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            autoComplete="new-password"
+            // autoComplete="new-password"
           />
           {password !== confirmPassword && confirmPassword !== "" && (
             <p className="text-sm text-red-500">*password ไม่ตรงกัน</p>

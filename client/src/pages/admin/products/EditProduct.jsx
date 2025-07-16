@@ -14,7 +14,6 @@ const EditProduct = () => {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        setLoading(true);
         const data = await fetchProductById(id); // เรียก API เพื่อดึงข้อมูลสินค้าด้วย ID
         setProductData(data);
       } catch (err) {

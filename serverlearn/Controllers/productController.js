@@ -46,7 +46,7 @@ exports.createproduct = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, price, quantity, description, category, images } = req.body;
+  const { name, price, quantity, description, category, images,sizes,colors } = req.body;
 
   try {
     const newProduct = new Product({
@@ -54,6 +54,8 @@ exports.createproduct = async (req, res) => {
       price,
       quantity,
       description,
+      sizes,
+      colors,
       category,
       images: images || [],
     });

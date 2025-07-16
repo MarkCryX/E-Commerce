@@ -68,11 +68,11 @@ exports.register = async (req, res) => {
 
     const finalProfileImageURL = uploadResult.secure_url;
 
-    const newUser = new User({ 
-      username, 
-      email, 
-      password: hashedPassword ,
-      profileImage: finalProfileImageURL
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      profileImage: finalProfileImageURL,
     });
 
     await newUser.save();
@@ -109,13 +109,13 @@ exports.login = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "15m" } // 15 นาที
     );
 
     const refreshToken = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" } // 7 วัน
     );
 
     user.refreshToken = refreshToken;
@@ -124,14 +124,15 @@ exports.login = async (req, res) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // ส่งผ่าน HTTPS เท่านั้นใน production
-      sameSite: "Strict", // ป้องกัน CSRF
-      maxAge: 15 * 60 * 60 * 1000, // อายุ 15 นาที
+      sameSite: "Lax", // ป้องกัน CSRF
+      maxAge: 15 * 60 * 1000, // อายุ 15 นาที
+      path: "/",
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // ส่งผ่าน HTTPS เท่านั้นใน production
-      sameSite: "Strict", // ป้องกัน CSRF
+      sameSite: "Lax", // ป้องกัน CSRF
       maxAge: 7 * 24 * 60 * 60 * 1000, // อายุ 7 วัน
       path: "/",
     });
@@ -141,6 +142,7 @@ exports.login = async (req, res) => {
       username: user.username,
       email: user.email,
       role: user.role,
+      profileImage: user.profileImage,
       // เพิ่ม field อื่นๆ ที่คุณต้องการส่งกลับไปด้วย เช่น cart, orders (ถ้าต้องการ)
     };
 
@@ -155,23 +157,37 @@ exports.login = async (req, res) => {
 
 exports.refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
+  
 
+  // 1. ตรวจสอบว่ามี Refresh Token หรือไม่
   if (!refreshToken) {
     return res
-      .status(401)
+      .status(403)
       .json({ isAuthenticated: false, message: "ไม่มี Refresh Token" });
   }
 
   try {
+    // 2. ตรวจสอบลายเซ็นและความถูกต้องของ Token
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    // ตรวจสอบว่า Refresh Token นี้ยังอยู่ในฐานข้อมูลหรือไม่ (เพื่อการเพิกถอน)
-    const user = await User.findById(decoded.userId);
+    console.log("✅ Decoded refresh token:", decoded);
+    // 3. ตรวจสอบในฐานข้อมูลว่า Token ยัง valid อยู่
+    const user = await User.findOne({
+      _id: decoded.userId,
+      refreshToken: refreshToken, // ตรวจสอบว่า Token ตรงกับใน DB
+    });
 
-    if (!user || user.refreshToken !== refreshToken) {
-      // หรือ !user.refreshTokens.includes(refreshToken)
+    if (!user) {
+      // ลบ Cookie ที่ไม่ถูกต้อง
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        path: "/",
+      });
+
       return res.status(403).json({
         isAuthenticated: false,
-        message: "Refresh Token ไม่ถูกต้องหรือไม่ได้รับอนุญาต",
+        message: "Refresh Token ไม่ถูกต้อง",
       });
     }
 
@@ -181,30 +197,38 @@ exports.refreshAccessToken = async (req, res) => {
       { expiresIn: "15m" }
     );
 
+    // 6. ตั้งค่า Cookie ใหม่
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "Lax",
       maxAge: 15 * 60 * 1000,
     });
 
-    res
-      .status(200)
-      .json({ isAuthenticated: true, message: "Access Token ถูกรีเฟรชแล้ว" });
+    // 7. ส่ง response กลับ
+    res.status(200).json({
+      isAuthenticated: true,
+      accessToken: newAccessToken,
+    });
   } catch (err) {
     console.error("Error refreshing token:", err);
 
-    // หาก Refresh Token หมดอายุหรือผิดปกติ
-    res.cookie("refreshToken", "", {
+    // 8. ลบ Cookie ที่หมดอายุหรือไม่ถูกต้อง
+    res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      expires: new Date(0),
-    }); // ลบ Refresh Token ที่หมดอายุ
+      sameSite: "Lax",
+      path: "/",
+    });
+
+    const message =
+      err.name === "TokenExpiredError"
+        ? "Refresh Token หมดอายุ"
+        : "Invalid Refresh Token";
 
     res.status(403).json({
       isAuthenticated: false,
-      message: "Refresh Token ไม่ถูกต้องหรือหมดอายุ โปรดเข้าสู่ระบบใหม่",
+      message,
     });
   }
 };
@@ -258,35 +282,61 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.checkAuthStatus = async (req, res) => {
-  // authCheck middleware จะแนบ req.user ถ้า token ถูกต้อง
-  if (req.user) {
-    try {
-      const user = await User.findById(req.user.userId).select("-password");
-      if (user) {
-        return res.status(200).json({ isAuthenticated: true, user: user });
-      }
-    } catch (error) {
-      console.error("Error fetching user for auth status:", error);
-    }
+  try {
+    return res.status(200).json({
+      isAuthenticated: true,
+      user: {
+        _id: req.user._id,
+        username: req.user.username,
+        email: req.user.email,
+        role: req.user.role,
+        profileImage: req.user.profileImage,
+      },
+    });
+  } catch (error) {
+    console.error("Error in checkAuthStatus (after middleware):", error);
+    res.status(500).json({ 
+      isAuthenticated: false, 
+      message: "Internal server error" 
+    });
   }
-  res.status(200).json({ isAuthenticated: false, user: null });
 };
 
+exports.hasToken = (req , res) => {
+  const hasAccessToken = Boolean(req.cookies?.accessToken);
+  const hasRefreshToken = Boolean(req.cookies?.refreshToken);
+
+  return res.json({
+    hasAccessToken,
+    hasRefreshToken
+  })
+}
+
 exports.logout = (req, res) => {
-  res.cookie("accessToken", "", {
+  res.clearCookie("accessToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-    expires: new Date(0),
+    sameSite: "Lax",
+    path: "/",
   });
 
-  // ลบ refreshToken cookie
-  res.cookie("refreshToken", "", {
+  res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-    expires: new Date(0),
+    sameSite: "Lax",
+    path: "/",
   });
 
-  res.status(200).json({ message: "ออกจากระบบสำเร็จ" });
+  // เพิ่ม header เพื่อป้องกัน caching
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate"
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+
+  res.status(200).json({
+    message: "ออกจากระบบสำเร็จ",
+    loggedOut: true, // เพิ่ม flag เพื่อให้ Frontend รู้ว่า logout สำเร็จ
+  });
 };

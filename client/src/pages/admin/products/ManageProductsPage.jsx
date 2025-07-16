@@ -1,7 +1,7 @@
 // src/pages/admin/ManageProductsPage.jsx
 import { useState, useEffect } from "react";
 import { fetchProducts } from "../../../api/product";
-import ProductCard from "../../../components/Product/ProductCard";
+import ProductCardAdmin from "../../../components/Product/ProductCardAdmin";
 import { Link } from "react-router-dom";
 
 const ManageProductsPage = () => {
@@ -59,7 +59,7 @@ const ManageProductsPage = () => {
       ) : (
         <div className="grid max-h-screen grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {products.map((product) => (
-            <ProductCard
+            <ProductCardAdmin
               key={product._id}
               products={product}
               onDeleteSuccess={loadProducts}

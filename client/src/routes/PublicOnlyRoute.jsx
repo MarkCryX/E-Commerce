@@ -1,24 +1,21 @@
 // src/components/PublicOnlyRoute.jsx
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const PublicOnlyRoute = ({ children }) => {
-    const { isAuthenticated, loading ,user} = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
-    // if (loading) {
-    //     return <div>กำลังโหลด...</div>; 
-    // }
+ 
 
-     // ถ้าล็อกอินแล้ว:
-    if (isAuthenticated) {
-        // ตรวจสอบ role เพื่อ redirect ไปยังหน้าที่ถูกต้อง
-        if (user && user.role === "admin") { // ต้องตรวจสอบ user และ user.role ด้วย
-            return <Navigate to="/admin/manage-orders" />; // <--- redirect ตรงนี้!
-        }
-        return <Navigate to="/profile" />; // <--- redirect ตรงนี้!
-    }
+  // ถ้าล็อกอินแล้ว:
+  if (isAuthenticated) {
+    // ใช้ state จาก location เพื่อป้องกันการ redirect ซ้อน
+    const from = location.state?.from?.pathname || 
+                 (user?.role === 'admin' ? '/admin/dashboard' : '/profile');
+    return <Navigate to={from} replace />;
+  }
 
-    return children; 
+  return children;
 };
 
 export default PublicOnlyRoute;

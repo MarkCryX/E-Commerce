@@ -1,66 +1,58 @@
-import { deleteProduct } from "@/api/product";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { motion, useAnimation } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
 
-const ProductCard = ({ products, onDeleteSuccess }) => {
-  if (!products || Object.keys(products).length === 0) {
-    return (
-      <div className="rounded-lg bg-white p-4 shadow-md">
-        <p className="text-gray-600">No product data available</p>
-      </div>
-    );
-  }
+const ProductCard = ({ product }) => {
+  const controls = useAnimation();
+  const [ref, inView] = useInView({ threshold: 0.1 }); // ให้ทำแค่รอบเดียวตอนเห็น
 
-  const handleDelete = async (productId) => {
-    const confirm = window.confirm(
-      `คุณแน่ใจว่าต้องการลบ ${products.name} หรือไม่?`,
-    );
-    if (!confirm) return;
-    try {
-      await deleteProduct(productId);
-      onDeleteSuccess();
-      toast.success("ลบสินค้าสำเร็จ");
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      toast.error(error?.response?.data?.message || "ลบสินค้าไม่สำเร็จ");
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible");
+    } else {
+      controls.start("hidden");
     }
-  };
+  }, [controls, inView]);
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-md">
-      {products.images && products.images.length > 0 ? (
-        <img
-          src={products.images[0].url}
-          alt={products.name}
-          className="mb-4 h-48 w-full rounded-t-lg object-contain"
-        />
-      ) : (
-        <div className="mb-4 flex h-48 w-full items-center justify-center rounded-t-lg bg-gray-200">
-          <span className="text-2xl text-gray-500">No Image Available</span>
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      variants={{
+        hidden: { opacity: 0, y: 50 },
+        visible: { opacity: 1, y: 0 },
+      }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="h-full"
+    >
+      <Link to={`/product/${product._id}`}>
+        <div className="h-full w-full cursor-pointer rounded-lg bg-white shadow-md transition duration-300 hover:scale-105">
+          {product.images?.[0]?.url ? (
+            <img
+              src={product.images[0].url}
+              alt=""
+              className="mb-2 h-64 w-full rounded-t-lg object-cover"
+            />
+          ) : (
+            <div className="mb-2 flex h-40 items-center justify-center rounded-t-lg bg-gray-200">
+              <h2 className="text-gray-500">ไม่มีรูป</h2>
+            </div>
+          )}
+
+          <div className="px-3 pb-3">
+            <h2 className="truncate text-base font-semibold text-gray-800">
+              {product.name}
+            </h2>
+            <p className="text-sm font-semibold text-gray-600">
+              ฿{product.price.toLocaleString()}
+            </p>
+          </div>
         </div>
-      )}
-      <div className="p-2">
-        <h2 className="mb-2 text-xl font-semibold">{products.name}</h2>
-        <p className="mb-2 text-gray-600">{products.description}</p>
-        <p className="text-lg font-bold text-green-600">
-          {products.price.toLocaleString()} บาท
-        </p>
-      </div>
-      <div className="mt-4 flex items-center justify-between p-2 text-lg text-white">
-        <Link
-          to={`/admin/edit-product/${products._id}`}
-          className="w-1/4 cursor-pointer rounded-2xl bg-yellow-500 p-1 hover:bg-yellow-600 text-center"
-        >
-          แก้ไข
-        </Link>
-        <button
-          className="w-1/4 cursor-pointer rounded-2xl bg-red-500 p-1 hover:bg-red-600"
-          onClick={() => handleDelete(products._id)}
-        >
-          ลบ
-        </button>
-      </div>
-    </div>
+      </Link>
+    </motion.div>
   );
 };
+
 export default ProductCard;
