@@ -21,7 +21,7 @@ exports.authCheck = async (req, res, next) => {
       // 2.2. ถ้าไม่มีทั้ง Access Token และ Refresh Token
       return res.status(401).json({
         isAuthenticated: false,
-        message: "ไม่พบ token การเข้าสู่ระบบ",
+        message: "No authentication token found",
       });
     }
 
@@ -40,7 +40,7 @@ exports.authCheck = async (req, res, next) => {
       if (!user) {
         return res.status(401).json({
           isAuthenticated: false,
-          message: "ไม่พบผู้ใช้",
+          message: "User not found",
         });
       }
 
@@ -62,13 +62,13 @@ exports.authCheck = async (req, res, next) => {
       // 4.2. ถ้า Access Token หมดอายุหรือไม่ถูกต้อง และไม่มี Refresh Token
       return res.status(401).json({
         isAuthenticated: false,
-        message: "Token ไม่ถูกต้อง",
+        message: "Invalid access token",
       });
     }
   } catch (error) {
     res.status(500).json({
       isAuthenticated: false,
-      message: "เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์",
+      message: "Authentication check failed",
     });
   }
 };

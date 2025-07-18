@@ -46,9 +46,18 @@ exports.createproduct = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, price, quantity, description, category, images,sizes,colors } = req.body;
-
   try {
+    const {
+      name,
+      price,
+      quantity,
+      description,
+      category,
+      images,
+      sizes,
+      colors,
+    } = req.body;
+
     const newProduct = new Product({
       name,
       price,
@@ -75,7 +84,6 @@ exports.createproduct = async (req, res) => {
     if (err.name === "ValidationError") {
       // หากเป็น Mongoose validation error ให้ดึงข้อความ error มาจาก err.errors
       const messages = Object.values(err.errors).map((val) => val.message);
-      // ส่ง status 400 Bad Request พร้อมข้อความ error ที่ชัดเจน
       return res.status(400).json({ message: messages });
     }
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
@@ -92,7 +100,6 @@ exports.updateproduct = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
   // ดักกรณีที่ไม่มีข้อมูลสำหรับอัปเดตเลย
   if (Object.keys(req.body).length === 0) {
     return res.status(400).json({ message: "กรุณาระบุข้อมูลที่จะอัปเดต" });

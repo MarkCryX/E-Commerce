@@ -8,45 +8,19 @@ const {
   checkAuthStatus,
   logout,
   refreshAccessToken,
-  hasToken
+  hasToken,
+  updateAddress,
+  updateisDefaultAddress,
+  createAddress,
+  deleteAddress,
 } = require("../Controllers/userController");
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
 const { body, param } = require("express-validator");
 const router = express.Router();
+const { addressValidationRules } = require("../validations/addressValidation");
+const { userValidationRules } = require("../validations/userValidation");
 
-router.post(
-  "/register",
-  [
-    body("username")
-      .trim()
-      .notEmpty()
-      .withMessage("username ห้ามว่างเปล่า")
-      .isLength({ min: 3, max: 30 })
-      .withMessage("ชื่อผู้ใช้ต้องมี 3-30 ตัวอักษร"),
-    body("email")
-      .trim()
-      .notEmpty()
-      .withMessage("email ห้ามว่างเปล่า")
-      .isEmail()
-      .withMessage("รูปแบบอีเมลไม่ถูกต้อง")
-      .normalizeEmail()
-      .escape(),
-    body("password")
-      .isLength({ min: 8 })
-      .withMessage("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร")
-      .isStrongPassword({
-        minLength: 8,
-        minLowercase: 1,
-        minUppercase: 1,
-        minNumbers: 1,
-        minSymbols: 1,
-      })
-      .withMessage(
-        "รหัสผ่านต้องมีอย่างน้อย 8 ตัว, มีตัวพิมพ์เล็ก, ตัวพิมพ์ใหญ่, ตัวเลข, และสัญลักษณ์"
-      ),
-  ],
-  register
-);
+router.post("/register", userValidationRules, register);
 
 router.post(
   "/login",
@@ -62,16 +36,44 @@ router.post(
   ],
   login
 );
+
 router.post("/logout", logout); // ไม่ต้องมี authCheck เพราะเราต้องการลบ cookie ไม่ว่า token จะถูกต้องหรือไม่ก็ตาม
-router.get("/auth/status",authCheck,checkAuthStatus); // ต้องผ่าน authCheck ก่อน
+
+router.get("/auth/status", authCheck, checkAuthStatus); // ต้องผ่าน authCheck ก่อน
 router.post("/auth/refresh_token", refreshAccessToken);
 router.get("/auth/has_token", hasToken);
+
 router.get("/users", authCheck, isAdmin, getAllUsers);
+
 router.get(
   "/users/:id",
   [param("id").isMongoId().withMessage("ID ผู้ใช้ไม่ถูกต้อง")],
   authCheck,
   getUserById
 );
+
+router.post(
+  "/users/me/address",
+  addressValidationRules,
+  authCheck,
+  createAddress
+);
+
+router.put(
+  "/users/me/address/:addressId",
+  [[param("addressId").isMongoId()]],
+  addressValidationRules,
+  authCheck,
+  updateAddress
+);
+
+router.put(
+  "/users/me/address/default/:addressId",
+  [param("addressId").isMongoId().withMessage("addressId ไม่ถูกต้อง")],
+  authCheck,
+  updateisDefaultAddress
+);
+
+router.delete("/users/me/address/:addressId", authCheck, deleteAddress);
 
 module.exports = router;

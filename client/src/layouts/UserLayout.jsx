@@ -1,10 +1,11 @@
+// src/layouts/UserLayout.jsx
+import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useEffect } from "react";
+import SidebarUser from "@/components/UserAccount/SidebarUser";
 
-function MainLayout() {
+const UserLayout = () => {
   const { isAuthenticated, user, logout } = useAuth();
 
   return (
@@ -12,14 +13,15 @@ function MainLayout() {
       <div className="font-kanit flex min-h-screen flex-col overflow-y-auto bg-gray-100">
         <Navbar isAuthenticated={isAuthenticated} user={user} logout={logout} />
 
-        <main className="flex-1">
+        <main className="container mx-auto grid flex-1 grid-cols-[1fr_6fr]">
+          <SidebarUser />
           <Outlet />
         </main>
-
+        
         <Footer />
       </div>
     </>
   );
-}
+};
 
-export default MainLayout;
+export default UserLayout;

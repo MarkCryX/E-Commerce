@@ -1,7 +1,7 @@
 // Routes/categoryRoutes.js
 const express = require("express");
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
-const { body,param } = require("express-validator"); // ใช้สำหรับ validation input
+const { body, param } = require("express-validator"); // ใช้สำหรับ validation input
 const {
   createCategory,
   readCategory,
@@ -9,6 +9,10 @@ const {
   updateCategory,
   deleteCategory,
 } = require("../Controllers/categoryController");
+const {
+  categoryValidationRules,
+} = require("../validations/categoryValidation");
+
 const router = express.Router();
 
 router.get("/category", readCategory);
@@ -21,15 +25,7 @@ router.get(
 
 router.post(
   "/category",
-  [
-    body("name")
-      .notEmpty()
-      .withMessage("ชื่อหมวดหมู่ห้ามว่างเปล่า")
-      .isLength({ min: 2, max: 50 })
-      .withMessage("ชื่อหมวดหมู่ต้องมีความยาวระหว่าง 2 ถึง 50 ตัวอักษร")
-      .trim()
-      .escape(), // ป้องกันการโจมตี XSS
-  ],
+  categoryValidationRules,
   authCheck,
   isAdmin,
   createCategory
@@ -37,20 +33,19 @@ router.post(
 
 router.put(
   "/category/:id",
-  [
-    body("name")
-      .notEmpty()
-      .withMessage("ชื่อหมวดหมู่ห้ามว่างเปล่า")
-      .isLength({ min: 2, max: 50 })
-      .withMessage("ชื่อหมวดหมู่ต้องมีความยาวระหว่าง 2 ถึง 50 ตัวอักษร")
-      .trim()
-      .escape(), // ป้องกันการโจมตี XSS
-  ],
+  [param("id").isMongoId().withMessage("ID หมวดหมู่ไม่ถูกต้อง")],
+  categoryValidationRules,
   authCheck,
   isAdmin,
   updateCategory
 );
 
-router.delete("/category/:id", authCheck, isAdmin, deleteCategory);
+router.delete(
+  "/category/:id",
+  [param("id").isMongoId().withMessage("ID หมวดหมู่ไม่ถูกต้อง")],
+  authCheck,
+  isAdmin,
+  deleteCategory
+);
 
 module.exports = router;

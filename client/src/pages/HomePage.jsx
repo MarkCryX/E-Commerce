@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import { fetchProducts } from "@/api/product";
 import ProductCard from "@/components/Product/ProductCard";
 import FadeInRightOnScroll from "@/components/Home/FadeInRightOnScroll";
@@ -48,7 +49,7 @@ function HomePage() {
         <h1 className="mb-5 text-center text-3xl font-semibold">
           สินค้าล่าสุด
         </h1>
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto">
           <Swiper
             modules={[Navigation, Scrollbar, A11y]}
             spaceBetween={20}
@@ -62,7 +63,7 @@ function HomePage() {
             }}
           >
             {products.map((product) => (
-              <SwiperSlide key={product._id}>
+              <SwiperSlide key={product._id} className="p-3">
                 <ProductCard product={product} />
               </SwiperSlide>
             ))}

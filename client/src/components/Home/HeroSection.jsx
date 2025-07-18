@@ -21,10 +21,10 @@ const LandingBanner = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center bg-gray-300">
+    <div className="flex min-h-screen items-center bg-gray-100">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
         <div className="flex flex-col">
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, x: -100 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1 }}
@@ -33,19 +33,20 @@ const LandingBanner = () => {
             <h1 className="mt-10 text-[70px] font-semibold sm:text-[80px] md:text-[85px] lg:text-[75px] xl:text-[95px]">
               Find your <br /> dream snekers
             </h1>
-          </motion.h1>
+          </motion.div>
           <TypewriterText
             text="F ind your shoes from our various collections. Here shoes are endless, and profit is also endless."
             className="text-md my-10 max-w-md text-gray-600 sm:text-lg"
           />
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
             transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 10,
-              delay: 2.3,
+              // type: "spring",
+              // stiffness: 300,
+              // damping: 10,
+              duration: 1,
+              delay: 2.1,
             }}
           >
             <Link

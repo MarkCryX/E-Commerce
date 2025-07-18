@@ -7,9 +7,9 @@ exports.createCategory = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const { name } = req.body;
 
   try {
+    const { name } = req.body;
     const existingCategory = await Category.findOne({ name });
 
     if (existingCategory) {

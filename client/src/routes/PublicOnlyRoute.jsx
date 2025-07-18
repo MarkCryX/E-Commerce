@@ -11,7 +11,7 @@ const PublicOnlyRoute = ({ children }) => {
   if (isAuthenticated) {
     // ใช้ state จาก location เพื่อป้องกันการ redirect ซ้อน
     const from = location.state?.from?.pathname || 
-                 (user?.role === 'admin' ? '/admin/dashboard' : '/profile');
+                 (user?.role === 'admin' ? '/admin/dashboard' : '/user/profile');
     return <Navigate to={from} replace />;
   }
 

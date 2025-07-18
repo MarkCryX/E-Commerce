@@ -8,12 +8,11 @@ const ProfilePage = () => {
   if (loading) {
     return <div>Loading profile...</div>; // Show loading state
   }
-
-
+  // console.log(user);
 
   // Render user data
   return (
-    <div className="container mx-auto my-8 rounded-lg bg-white p-6 shadow-md">
+    <div className="my-8 rounded-lg bg-white p-6 shadow-md">
       <h1 className="mb-6 text-center text-3xl font-bold">Your Profile</h1>
       {user ? (
         <div className="space-y-4">
@@ -26,6 +25,7 @@ const ProfilePage = () => {
           <p className="text-lg">
             <strong>Role:</strong> {user.role}
           </p>
+          
           <img
             src={user.profileImage}
             alt="profile"

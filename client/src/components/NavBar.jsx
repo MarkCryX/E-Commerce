@@ -25,8 +25,8 @@ function NavBar({ isAuthenticated, user, logout }) {
       : "border-b-2 border-transparent hover:border-blue-500 transition-all duration-300";
 
   return (
-    <nav className="bg-gray-300 py-3">
-      <div className="container mx-auto flex items-center gap-4">
+    <nav className="bg-gray-100 py-3">
+      <div className="container mx-auto flex items-center gap-4 rounded-2xl bg-gray-300 px-4 py-3">
         {/* Left side: Logo + NavLinks */}
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-extrabold text-gray-800">SHOPPER</h1>
@@ -114,15 +114,15 @@ function NavBar({ isAuthenticated, user, logout }) {
                   className="z-50 mt-2 w-40 rounded-md border bg-white shadow-md"
                   align="end"
                 >
-                  <DropdownMenuLabel>บัญชีของฉัน</DropdownMenuLabel>
+                  <DropdownMenuLabel>Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem asChild>
                     <NavLink
-                      to="/profile"
+                      to="/user/profile"
                       className="w-full cursor-pointer text-left"
                     >
-                      โปรไฟล์
+                      บัญชีของฉัน
                     </NavLink>
                   </DropdownMenuItem>
                   {user?.role === "admin" && (

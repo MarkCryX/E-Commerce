@@ -29,6 +29,10 @@ import CreateProduct from "@/pages/admin/products/CreateProduct";
 import ManageCategory from "@/pages/admin/category/ManageCategory";
 import EditProduct from "@/pages/admin/products/EditProduct";
 import CartPage from "@/pages/user/CartPage";
+import UserLayout from "@/layouts/UserLayout";
+import AddressesPage from "@/pages/user/AddressesPage";
+import ChangepasswordPage from "@/pages/user/ChangepasswordPage";
+import OrderPage from "@/pages/user/OrderPage";
 
 function AppRoutes() {
   const router = createBrowserRouter(
@@ -55,14 +59,6 @@ function AppRoutes() {
             }
           />
           <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <ProfilePage />
-              </PrivateRoute>
-            }
-          />
-          <Route
             path="/cart"
             element={
               <PrivateRoute>
@@ -71,6 +67,20 @@ function AppRoutes() {
             }
           />
           <Route path="*" element={<NotFoundPage />} />
+        </Route>
+
+        <Route
+          path="/user"
+          element={
+            <PrivateRoute>
+              <UserLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="address" element={<AddressesPage />} />
+          <Route path="password" element={<ChangepasswordPage />} />
+          <Route path="orders" element={<OrderPage />} />
         </Route>
 
         <Route

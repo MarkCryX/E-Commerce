@@ -31,14 +31,13 @@ exports.register = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
-  const { username, email, password } = req.body;
-
   try {
+    const { username, email, password } = req.body;
+
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ message: "อีเมลนี้ถูกใช้ไปแล้ว" });
+      return res.status(400).json({ message: "This email is already in use" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -77,10 +76,10 @@ exports.register = async (req, res) => {
 
     await newUser.save();
 
-    res.status(201).json({ message: "ลงทะเบียนสำเร็จ" });
+    res.status(201).json({ message: "Registration successful" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+    res.status(500).json({ message: "Server error occurred" });
   }
 };
 
@@ -91,19 +90,19 @@ exports.login = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
+
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const accessToken = jwt.sign(
@@ -143,33 +142,33 @@ exports.login = async (req, res) => {
       email: user.email,
       role: user.role,
       profileImage: user.profileImage,
+      addresses: user.addresses,
       // เพิ่ม field อื่นๆ ที่คุณต้องการส่งกลับไปด้วย เช่น cart, orders (ถ้าต้องการ)
     };
 
     res
       .status(200)
-      .json({ message: "เข้าสู่ระบบสำเร็จ", user: userWithoutPassword });
+      .json({ message: "Login successful", user: userWithoutPassword });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+    res.status(500).json({ message: "Server error occurred" });
   }
 };
 
 exports.refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
-  
 
   // 1. ตรวจสอบว่ามี Refresh Token หรือไม่
   if (!refreshToken) {
     return res
       .status(403)
-      .json({ isAuthenticated: false, message: "ไม่มี Refresh Token" });
+      .json({ isAuthenticated: false, message: "Refresh token not found" });
   }
 
   try {
     // 2. ตรวจสอบลายเซ็นและความถูกต้องของ Token
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    console.log("✅ Decoded refresh token:", decoded);
+    // console.log("✅ Decoded refresh token:", decoded);
     // 3. ตรวจสอบในฐานข้อมูลว่า Token ยัง valid อยู่
     const user = await User.findOne({
       _id: decoded.userId,
@@ -187,7 +186,7 @@ exports.refreshAccessToken = async (req, res) => {
 
       return res.status(403).json({
         isAuthenticated: false,
-        message: "Refresh Token ไม่ถูกต้อง",
+        message: "Invalid refresh token",
       });
     }
 
@@ -223,7 +222,7 @@ exports.refreshAccessToken = async (req, res) => {
 
     const message =
       err.name === "TokenExpiredError"
-        ? "Refresh Token หมดอายุ"
+        ? "Refresh token expired"
         : "Invalid Refresh Token";
 
     res.status(403).json({
@@ -240,7 +239,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(200).json(users);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้" });
+    res.status(500).json({ message: "Failed to fetch users" });
   }
 };
 
@@ -256,7 +255,7 @@ exports.getUserById = async (req, res) => {
   if (req.user.role !== "admin" && req.user.userId !== userId) {
     return res
       .status(403)
-      .json({ message: "ไม่ได้รับอนุญาตให้เข้าถึงข้อมูลผู้ใช้นี้" });
+      .json({ message: "Not authorized to access this user's data" });
   }
 
   try {
@@ -265,7 +264,7 @@ exports.getUserById = async (req, res) => {
       .select("-password");
 
     if (!user) {
-      return res.status(404).json({ message: "ไม่พบผู้ใช้" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.status(200).json(user);
@@ -274,10 +273,10 @@ exports.getUserById = async (req, res) => {
     if (err.name === "CastError" && err.path === "_id") {
       return res
         .status(400)
-        .json({ message: "ID คำสั่งซื้อไม่ถูกต้องในฐานข้อมูล" });
+        .json({ message: "Invalid user ID format in database" });
     }
 
-    res.status(500).json({ message: "เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้" });
+    res.status(500).json({ message: "Failed to fetch user data" });
   }
 };
 
@@ -291,26 +290,27 @@ exports.checkAuthStatus = async (req, res) => {
         email: req.user.email,
         role: req.user.role,
         profileImage: req.user.profileImage,
+        addresses: req.user.addresses,
       },
     });
   } catch (error) {
     console.error("Error in checkAuthStatus (after middleware):", error);
-    res.status(500).json({ 
-      isAuthenticated: false, 
-      message: "Internal server error" 
+    res.status(500).json({
+      isAuthenticated: false,
+      message: "Internal server error",
     });
   }
 };
 
-exports.hasToken = (req , res) => {
+exports.hasToken = (req, res) => {
   const hasAccessToken = Boolean(req.cookies?.accessToken);
   const hasRefreshToken = Boolean(req.cookies?.refreshToken);
 
   return res.json({
     hasAccessToken,
-    hasRefreshToken
-  })
-}
+    hasRefreshToken,
+  });
+};
 
 exports.logout = (req, res) => {
   res.clearCookie("accessToken", {
@@ -336,7 +336,191 @@ exports.logout = (req, res) => {
   res.setHeader("Expires", "0");
 
   res.status(200).json({
-    message: "ออกจากระบบสำเร็จ",
+    message: "Logout successful",
     loggedOut: true, // เพิ่ม flag เพื่อให้ Frontend รู้ว่า logout สำเร็จ
   });
+};
+
+exports.createAddress = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  // ดักกรณีที่ไม่มีข้อมูลสำหรับอัปเดตเลย
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).json({ message: "กรุณาระบุข้อมูลที่จะอัปเดต" });
+  }
+
+  try {
+    const userId = req.user.id;
+    const address = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.addresses) {
+      user.addresses = [];
+    }
+
+    if (user.addresses.length === 0) {
+      address.isDefault = true;
+    }
+
+    if (address.isDefault) {
+      user.addresses.forEach((addr) => {
+        addr.isDefault = false;
+      });
+    }
+
+    user.addresses.push(address);
+
+    await user.save();
+
+    res.status(201).json({
+      message: "Address added successfully.",
+      addresses: user.addresses,
+    });
+  } catch (error) {
+    console.error(err);
+    if (err.name === "ValidationError") {
+      // หากเป็น Mongoose validation error ให้ดึงข้อความ error มาจาก err.errors
+      const messages = Object.values(err.errors).map((val) => val.message);
+      // ส่ง status 400 Bad Request พร้อมข้อความ error ที่ชัดเจน
+      return res.status(400).json({ message: messages });
+    }
+    res.status(500).json({ message: "Server error occurred" });
+  }
+};
+
+exports.updateAddress = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const userId = req.user.id;
+    const { addressId } = req.params;
+    const newAddress = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "ไม่พบผู้ใช้" });
+
+    const addressIndex = user.addresses.findIndex(
+      (addr) => addr._id.toString() === addressId
+    );
+    if (addressIndex === -1) {
+      return res
+        .status(404)
+        .json({ message: "ไม่พบบ้านเลขที่ที่ต้องการแก้ไข" });
+    }
+
+    user.addresses[addressIndex] = {
+      ...user.addresses[addressIndex],
+      ...newAddress,
+    };
+
+    await user.save();
+
+    res.json({ message: "อัปเดตที่อยู่สำเร็จ", addresses: user.addresses });
+  } catch (err) {
+    console.error(err);
+    if (err.name === "ValidationError") {
+      // หากเป็น Mongoose validation error ให้ดึงข้อความ error มาจาก err.errors
+      const messages = Object.values(err.errors).map((val) => val.message);
+      // ส่ง status 400 Bad Request พร้อมข้อความ error ที่ชัดเจน
+      return res.status(400).json({ message: messages });
+    }
+    res.status(500).json({ message: "Server error occurred" });
+  }
+};
+
+exports.updateisDefaultAddress = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const userId = req.user.id; // มาจาก token ผ่าน authCheck
+    const { addressId } = req.params;
+    if (!addressId) {
+      return res.status(400).json({ message: "addressId จำเป็นต้องส่งมาด้วย" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "ไม่พบผู้ใช้" });
+
+    const address = user.addresses.find((a) => a._id.toString() === addressId);
+    if (!address) return res.status(404).json({ message: "ไม่พบที่อยู่" });
+
+    user.addresses.forEach((a) => {
+      a.isDefault = false;
+    });
+
+    address.isDefault = true;
+
+    await user.save();
+
+    res.status(200).json({
+      message: "อัปเดตที่อยู่เริ่มต้นเรียบร้อย",
+      addresses: user.addresses,
+    });
+  } catch (err) {
+    console.error(err);
+
+    if (err.kind === "ObjectId") {
+      return res.status(400).json({ message: "ID สินค้าไม่ถูกต้อง" });
+    }
+
+    res.status(500).json({ message: "Server error occurred" });
+  }
+};
+
+exports.deleteAddress = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const userId = req.user.id; // มาจาก token ผ่าน authCheck
+    const { addressId } = req.params;
+    if (!addressId) {
+      return res.status(400).json({ message: "addressId จำเป็นต้องส่งมาด้วย" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "ไม่พบผู้ใช้" });
+
+    const addressIndex = user.addresses.findIndex(
+      (addr) => addr._id.toString() === addressId
+    );
+
+    if (addressIndex === -1) {
+      return res.status(404).json({ message: "ไม่พบที่อยู่ที่ต้องการลบ" });
+    }
+
+    user.addresses.splice(addressIndex, 1);
+
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "ลบที่อยู่เรียบร้อยแล้ว", addresses: user.addresses });
+  } catch (err) {
+    console.error(err);
+    if (err.name === "ValidationError") {
+      // หากเป็น Mongoose validation error ให้ดึงข้อความ error มาจาก err.errors
+      const messages = Object.values(err.errors).map((val) => val.message);
+      // ส่ง status 400 Bad Request พร้อมข้อความ error ที่ชัดเจน
+      return res.status(400).json({ message: messages });
+    }
+    res.status(500).json({ message: "Server error occurred" });
+  }
 };

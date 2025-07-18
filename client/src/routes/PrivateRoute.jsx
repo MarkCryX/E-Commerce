@@ -10,7 +10,7 @@ const PrivateRoute = ({ children, roles }) => {
     hasLoggedOut,
     hasRefreshTokenFailed,
   } = useAuth();
-
+  const location = useLocation();
 
   // ถ้ายัง loading อยู่หรือกำลังเช็ค auth
   if (loading) {
@@ -25,7 +25,7 @@ const PrivateRoute = ({ children, roles }) => {
   }
 
   if (!isAuthenticated || hasLoggedOut || hasRefreshTokenFailed) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
   if (roles && !roles.includes(user?.role)) {
