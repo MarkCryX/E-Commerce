@@ -12,19 +12,6 @@ if (!cloudinary.config().cloud_name) {
   );
 }
 
-const getRandomBackgroundColor = () => {
-  const colors = [
-    "4287f5", // Blue
-    "f54242", // Red
-    "42f567", // Green
-    "f5e742", // Yellow
-    "9b42f5", // Purple
-    "f542d1", // Pink
-    "42f5c2", // Teal
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
-};
-
 exports.register = async (req, res) => {
   const errors = validationResult(req);
 
@@ -42,30 +29,8 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // --- Logic สำหรับสร้าง URL รูปโปรไฟล์อัตโนมัติ ---
-    const firstLetter = username.charAt(0).toUpperCase(); // เอาตัวอักษรแรกของ username
-    const bgColor = getRandomBackgroundColor(); // สุ่มสีพื้นหลัง
-    const textColor = "ffffff"; // สีข้อความเป็นสีขาว (ตามต้องการ)
-
-    // หากใช้การสร้าง Text-to-Image โดยตรงของ Cloudinary (ง่ายกว่า)
-    // คุณต้องกำหนด public_id ที่ไม่ซ้ำกัน
-    const generatedImagePublicId = `user_profile/${username}_${Date.now()}`;
-    const uploadResult = await cloudinary.uploader.text(firstLetter, {
-      // ปรับปรุงรูปภาพตรงนี้
-      public_id: generatedImagePublicId,
-      folder: "UserProfiles", // โฟลเดอร์สำหรับรูปโปรไฟล์ผู้ใช้
-      font_family: "Arial",
-      font_size: 120,
-      font_weight: "bold",
-      background: `#${bgColor}`,
-      color: `#${textColor}`,
-      width: 200,
-      height: 200,
-      gravity: "center",
-      crop: "fill",
-    });
-
-    const finalProfileImageURL = uploadResult.secure_url;
+    const finalProfileImageURL =
+      "https://res.cloudinary.com/dim59skus/image/upload/v1753422716/blank-profile-picture-973460_1280_kpbjpk.png";
 
     const newUser = new User({
       username,
@@ -143,6 +108,7 @@ exports.login = async (req, res) => {
       role: user.role,
       profileImage: user.profileImage,
       addresses: user.addresses,
+      orders: user.orders,
       // เพิ่ม field อื่นๆ ที่คุณต้องการส่งกลับไปด้วย เช่น cart, orders (ถ้าต้องการ)
     };
 
@@ -156,19 +122,19 @@ exports.login = async (req, res) => {
 };
 
 exports.refreshAccessToken = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-
-  // 1. ตรวจสอบว่ามี Refresh Token หรือไม่
-  if (!refreshToken) {
-    return res
-      .status(403)
-      .json({ isAuthenticated: false, message: "Refresh token not found" });
-  }
-
   try {
+    const refreshToken = req.cookies.refreshToken;
+
+    // 1. ตรวจสอบว่ามี Refresh Token หรือไม่
+    if (!refreshToken) {
+      return res
+        .status(403)
+        .json({ isAuthenticated: false, message: "Refresh token not found" });
+    }
+
     // 2. ตรวจสอบลายเซ็นและความถูกต้องของ Token
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    // console.log("✅ Decoded refresh token:", decoded);
+
     // 3. ตรวจสอบในฐานข้อมูลว่า Token ยัง valid อยู่
     const user = await User.findOne({
       _id: decoded.userId,
@@ -196,12 +162,29 @@ exports.refreshAccessToken = async (req, res) => {
       { expiresIn: "15m" }
     );
 
+    const newRefreshToken = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    user.refreshToken = newRefreshToken;
+
+    await user.save();
+
     // 6. ตั้งค่า Cookie ใหม่
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
       maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     // 7. ส่ง response กลับ
@@ -230,6 +213,39 @@ exports.refreshAccessToken = async (req, res) => {
       message,
     });
   }
+};
+
+exports.checkAuthStatus = async (req, res) => {
+  try {
+    return res.status(200).json({
+      isAuthenticated: true,
+      user: {
+        _id: req.user._id,
+        username: req.user.username,
+        email: req.user.email,
+        role: req.user.role,
+        profileImage: req.user.profileImage,
+        addresses: req.user.addresses,
+        orders: req.user.orders,
+      },
+    });
+  } catch (error) {
+    console.error("Error in checkAuthStatus (after middleware):", error);
+    res.status(500).json({
+      isAuthenticated: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+exports.hasToken = (req, res) => {
+  const hasAccessToken = Boolean(req.cookies?.accessToken);
+  const hasRefreshToken = Boolean(req.cookies?.refreshToken);
+
+  return res.json({
+    hasAccessToken,
+    hasRefreshToken,
+  });
 };
 
 exports.getAllUsers = async (req, res) => {
@@ -280,39 +296,26 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-exports.checkAuthStatus = async (req, res) => {
-  try {
-    return res.status(200).json({
-      isAuthenticated: true,
-      user: {
-        _id: req.user._id,
-        username: req.user.username,
-        email: req.user.email,
-        role: req.user.role,
-        profileImage: req.user.profileImage,
-        addresses: req.user.addresses,
-      },
-    });
-  } catch (error) {
-    console.error("Error in checkAuthStatus (after middleware):", error);
-    res.status(500).json({
-      isAuthenticated: false,
-      message: "Internal server error",
-    });
+exports.logout = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (refreshToken) {
+    try {
+      const user = await User.findOne({ refreshToken });
+
+      if (user) {
+        // ลบเฉพาะ Token ที่ใช้ล็อกเอาท์
+        await User.findByIdAndUpdate(user._id, {
+          $unset: { refreshToken: "" },
+        });
+
+        await user.save();
+      }
+    } catch (err) {
+      console.error("Error removing refresh token:", err);
+    }
   }
-};
 
-exports.hasToken = (req, res) => {
-  const hasAccessToken = Boolean(req.cookies?.accessToken);
-  const hasRefreshToken = Boolean(req.cookies?.refreshToken);
-
-  return res.json({
-    hasAccessToken,
-    hasRefreshToken,
-  });
-};
-
-exports.logout = (req, res) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

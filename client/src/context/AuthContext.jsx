@@ -145,37 +145,57 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Setup Interceptor
+
+  // ไว้จัดการ accesstoken หมดอายุ และได้รับ 401 มาจาก authcheck จากนั้นก็จะ เรียก refreshtoken และทำการส่งข้อมูลไปที่ apiที่ ตอบกลับ 401ไปอีกรอบ ให้สำเร็จ
   useEffect(() => {
-    // 1. ตรวจสอบว่า interceptor ได้รับการเริ่มต้นแล้วหรือไม่
-    if (interceptorInitialized.current) return;
-    interceptorInitialized.current = true;
+    // ตรวจสอบว่า interceptor ยังไม่ได้ถูกตั้งค่าจริง ๆ (ไม่ว่าจะเป็นครั้งแรก หรือหลังจาก StrictMode remount)
+    // เราจะใช้ interceptorInitialized.current เป็น Flag ในการตรวจสอบว่า Interceptor ได้ถูกสร้างขึ้นแล้วหรือไม่
+    if (!interceptorInitialized.current) {
+      const interceptor = axios.interceptors.response.use(
+        (response) => response, // ถ้า Response สำเร็จ ให้ส่ง Response ต่อไป
+        async (error) => {
+          const originalRequest = error.config; // เก็บ Request เดิม
 
-    // 2. เพิ่ม Interceptor สำหรับ Response
-    const interceptor = axios.interceptors.response.use(
-      (response) => response, // ถ้า Response สำเร็จ ให้ส่ง Response ต่อไป
-      async (error) => {
-        const originalRequest = error.config; // เก็บ Request เดิม
+          // ถ้าได้รับสถานะ 401 และ Request เดิมยังไม่เคยถูก Retry มาก่อน
+          if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true; // ตั้งค่าว่า Request นี้ได้ถูก Retry แล้ว
 
-        // 3. ถ้าได้รับสถานะ 401 และ Request เดิมยังไม่เคยถูก Retry มาก่อน
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true; // ตั้งค่าว่า Request นี้ได้ถูก Retry แล้ว
-
-          const refreshSuccess = await refreshToken(); // พยายาม refresh token
-
-          // ถ้า refresh สำเร็จ ให้ retry Request เดิม
-          if (refreshSuccess) {
-            return axios(originalRequest);
+            try {
+              const refreshSuccess = await refreshToken(); // พยายาม refresh token
+              // ถ้า refresh สำเร็จ ให้ retry Request เดิม
+              if (refreshSuccess) {
+                return axios(originalRequest);
+              } else {
+                // ถ้า refresh ไม่สำเร็จ, ส่ง error ต่อไป
+                return Promise.reject(error);
+              }
+            } catch (refreshError) {
+              // ถ้า refreshToken มีปัญหา หรือ Network error, ก็ส่ง error เดิมต่อไป
+              return Promise.reject(error);
+            }
           }
-        }
-        return Promise.reject(error); // ถ้าไม่ใช่ 401 หรือ refresh ไม่สำเร็จ ให้ส่ง Error ต่อไป
-      },
-    );
+          // ถ้าไม่ใช่ 401 หรือ refresh ไม่สำเร็จ หรือ Request ถูก retry ไปแล้ว ให้ส่ง Error ต่อไป
+          return Promise.reject(error);
+        },
+      );
 
-    return () => {
-      axios.interceptors.response.eject(interceptor); // 4. Cleanup Function: ลบ Interceptor เมื่อ Component ถูก Unmount
-    };
-  }, []);
+      // หลังจากเพิ่ม interceptor สำเร็จ ให้ตั้งค่า flag นี้เป็น true
+      // เพื่อป้องกันการเพิ่มซ้ำในรอบ StrictMode remount หรือถ้า component ถูก mount ใหม่จริงๆ
+      interceptorInitialized.current = true;
+
+      // Cleanup function: ลบ Interceptor เมื่อ component ถูก unmount จริงๆ เท่านั้น (เช่นออกจากหน้าที่มี AuthProvider)
+      return () => {
+        axios.interceptors.response.eject(interceptor);
+        interceptorInitialized.current = false; // Reset flag เมื่อ unmount จริงๆ
+      };
+    } else {
+      // ในกรณีที่ StrictMode remount หรือ useEffect ถูกเรียกซ้ำด้วยเหตุผลอื่น
+      // และ interceptorInitialized.current เป็น true อยู่แล้ว เราจะไม่ทำอะไรซ้ำ
+      return () => {
+        // Cleanup function for subsequent runs (if any) or if the component is truly unmounting later
+      };
+    }
+  }, [axios]); // Dependency array: เพิ่ม axios เป็น dependency หากมีการเปลี่ยนแปลง instance (ไม่น่าใช่ในกรณีนี้)
 
   useEffect(() => {
     const initializeAuth = async () => {
