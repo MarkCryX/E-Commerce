@@ -28,7 +28,7 @@ const PrivateRoute = ({ children, roles }) => {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  if (roles && !roles.includes(user?.role)) {
+  if (roles && user && !roles.includes(user?.role)) {
     return <Navigate to="/" replace />;
   }
 

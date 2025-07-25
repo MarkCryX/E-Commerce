@@ -1,10 +1,18 @@
 import { useCart } from "@/context/CartContext";
 import { MdDeleteOutline } from "react-icons/md";
 import { Link, NavLink } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
+import AddressModal from "@/components/UserAccount/Adress/AddressModal";
 
 const CartPage = () => {
-  const { cart, removeFromCart, addToCart, handleIncrease, handleDecrease } =
-    useCart();
+  const { user } = useAuth();
+  const { cart, removeFromCart, addToCart, handleIncrease, handleDecrease } = useCart();
+  const [addressModal, setAddressModal] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const address = user.addresses;
+  const currentAddress = selectedAddress || address.find((address) => address.isDefault);
+
 
   const total = cart
     .reduce((total, item) => item.quantity * item.price + total, 0)
@@ -12,10 +20,22 @@ const CartPage = () => {
 
   const itemcart = cart.reduce((total, item) => total + item.quantity, 0);
 
+
+   useEffect(() => {
+    if (addressModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [addressModal]);
+
   return (
     <div className="container mx-auto">
-      <div className="grid grid-cols-2 gap-5 pt-5">
-        <div className="h-[750px] w-full overflow-y-scroll rounded-lg bg-white p-4 shadow-md">
+      <div className="grid grid-cols-1 gap-5 pt-5 sm:grid-cols-2">
+        <div className="h-[300px] w-full overflow-y-scroll rounded-lg bg-white p-4 shadow-md sm:h-[750px]">
           <p className="text-3xl font-semibold">
             ตะกร้าสินค้า{" "}
             <span className="text-gray-700">{`(${itemcart})`}</span>
@@ -26,11 +46,7 @@ const CartPage = () => {
               key={`${product._id}-${product.size}-${product.color}`}
             >
               <div className="flex justify-center">
-                <img
-                  src={product.image}
-                  alt=""
-                  className="h-16 "
-                />
+                <img src={product.image} alt="" className="h-16" />
               </div>
               <div>
                 <p className="text-xl">{product.name}</p>
@@ -73,6 +89,29 @@ const CartPage = () => {
         </div>
         <div className="flex h-[750px] w-full flex-col gap-2 rounded-lg bg-white p-4 shadow-md">
           <p className="mb-2 text-3xl font-semibold">สรุป</p>
+          <p>ที่อยู่ในการจัดส่ง</p>
+          <div className="rounded-lg border border-blue-300 bg-blue-50 p-2">
+            {currentAddress && (
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <div className="flex gap-2">
+                    <p className="font-bold">{currentAddress.name}</p>
+                    <p>{currentAddress.phone}</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setAddressModal(true)}
+                      className="cursor-pointer text-blue-400"
+                    >
+                      เปลี่ยน
+                    </button>
+                  </div>
+                </div>
+                <p>{`${currentAddress.addressLine} ตำบล${currentAddress.subDistrict}, อำเภอ${currentAddress.district} จังหวัด${currentAddress.province} ${currentAddress.postalCode}`}</p>
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-between border-b-1 pb-3">
             <p>{itemcart} ชิ้น:</p>
             <p>{total}฿</p>
@@ -108,7 +147,7 @@ const CartPage = () => {
               สั่งสินค้า
             </button>
           </div>
-          
+
           <Link
             to="/"
             className="w-full cursor-pointer rounded-full bg-white px-5 py-2 text-center shadow shadow-black/20"
@@ -117,6 +156,17 @@ const CartPage = () => {
           </Link>
         </div>
       </div>
+      {addressModal && (
+        <AddressModal
+          address={address}
+          onClose={() => setAddressModal(false)}
+          onSelect={(newAddress) => {
+            setSelectedAddress(newAddress);
+            setAddressModal(false);
+          }}
+          currentAddress={currentAddress}
+        />
+      )}
     </div>
   );
 };

@@ -7,7 +7,7 @@ import {
   updateAdress,
 } from "@/api/accountuser";
 import { useState } from "react";
-import AddressCard from "@/components/UserAccount/AddressCard";
+import AddressCard from "@/components/UserAccount/Adress/AddressCard";
 
 const AddressesPage = () => {
   const { user, loading, setUser } = useAuth();
@@ -116,7 +116,7 @@ const AddressesPage = () => {
                   <div>
                     <div className="flex">
                       <p className="border-r border-gray-400 pr-3 font-medium">
-                        นาย {addr.name}
+                        {addr.name}
                       </p>
                       <p className="pl-3">เบอร์ {addr.phone}</p>
                     </div>

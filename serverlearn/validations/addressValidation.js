@@ -9,11 +9,7 @@ exports.addressValidationRules = [
     .trim()
     .escape()
     .withMessage("กรุณากรอกเบอร์โทรให้ถูกต้อง"),
-  body("addressLine")
-    .notEmpty()
-    .trim()
-    .escape()
-    .withMessage("กรุณากรอกที่อยู่"),
+  body("addressLine").notEmpty().trim().withMessage("กรุณากรอกที่อยู่"),
   body("subDistrict").notEmpty().trim().escape().withMessage("กรุณากรอกตำบล"),
   body("district").notEmpty().trim().escape().withMessage("กรุณากรอกอำเภอ"),
   body("province").notEmpty().trim().escape().withMessage("กรุณากรอกจังหวัด"),

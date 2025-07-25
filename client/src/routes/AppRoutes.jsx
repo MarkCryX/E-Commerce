@@ -13,7 +13,8 @@ import AboutPage from "../pages/AboutPage";
 import NotFoundPage from "../pages/NotFoundPage";
 // import EcomPage from "./pages/EcomPage";
 import Register from "../pages/RegisterPage";
-import ProductPage from "../pages/ProductPage";
+import ProductPage from "@/pages/ProductPage";
+import ProductIdPage from "../pages/ProductIdPage";
 import LoginPage from "../pages/LoginPage";
 import { AuthProvider } from "../context/AuthContext"; // Import AuthProvider
 import PrivateRoute from "./PrivateRoute";
@@ -41,7 +42,8 @@ function AppRoutes() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/product" element={<ProductPage />} />
+          <Route path="/product/:id" element={<ProductIdPage />} />
           <Route
             path="/register"
             element={
