@@ -40,7 +40,12 @@ const ProductCardAdmin = ({ products, onDeleteSuccess }) => {
         </div>
       )}
       <div className="p-2">
-        <h2 className="mb-2 text-xl font-semibold">{products.name}</h2>
+        <div className="flex justify-between">
+          <h2 className="mb-2 text-xl font-semibold">{products.name}</h2>
+          <p className="mb-2 text-xl text-gray-700 ">
+            สินค้าเหลือ {products.quantity} ชิ้น
+          </p>
+        </div>
         {/* <p className="mb-2 text-gray-600">{products.description}</p> */}
         <p className="text-lg font-bold text-green-600">
           {products.price.toLocaleString()} บาท
@@ -49,7 +54,7 @@ const ProductCardAdmin = ({ products, onDeleteSuccess }) => {
       <div className="mt-4 flex items-center justify-between p-2 text-lg text-white">
         <Link
           to={`/admin/edit-product/${products._id}`}
-          className="w-1/4 cursor-pointer rounded-2xl bg-yellow-500 p-1 hover:bg-yellow-600 text-center"
+          className="w-1/4 cursor-pointer rounded-2xl bg-yellow-500 p-1 text-center hover:bg-yellow-600"
         >
           แก้ไข
         </Link>
