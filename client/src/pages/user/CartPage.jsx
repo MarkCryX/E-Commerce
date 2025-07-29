@@ -3,25 +3,62 @@ import { MdDeleteOutline } from "react-icons/md";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
+import { createOrder } from "@/api/orders";
+import { toast } from "react-toastify";
 import AddressModal from "@/components/UserAccount/Adress/AddressModal";
 
 const CartPage = () => {
   const { user } = useAuth();
-  const { cart, removeFromCart, addToCart, handleIncrease, handleDecrease } = useCart();
+  const {
+    cart,
+    removeFromCart,
+    addToCart,
+    clearCart,
+    handleIncrease,
+    handleDecrease,
+  } = useCart();
   const [addressModal, setAddressModal] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const address = user.addresses;
-  const currentAddress = selectedAddress || address.find((address) => address.isDefault);
+  const currentAddress =
+    selectedAddress || address.find((address) => address.isDefault);
 
-
-  const total = cart
-    .reduce((total, item) => item.quantity * item.price + total, 0)
-    .toLocaleString();
+  const total = cart.reduce(
+    (total, item) => item.quantity * item.price + total,
+    0,
+  );
 
   const itemcart = cart.reduce((total, item) => total + item.quantity, 0);
 
+  const handleSubmit = async () => {
+    try {
+      if (!currentAddress) {
+        toast.warn("กรุณาเลือกที่อยู่ก่อนทำการสั่งซื้อ");
+        return;
+      }
 
-   useEffect(() => {
+      const orderData = {
+        products: cart.map((item) => ({
+          product: item.product,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+        })),
+        totalAmount: total,
+        shippingAddress: currentAddress,
+      };
+
+      const response = await createOrder(orderData);
+      clearCart();
+      toast.success("สั่งซื้อสินค้าสำเร็จ");
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  useEffect(() => {
     if (addressModal) {
       document.body.style.overflow = "hidden";
     } else {
@@ -91,7 +128,7 @@ const CartPage = () => {
           <p className="mb-2 text-3xl font-semibold">สรุป</p>
           <p>ที่อยู่ในการจัดส่ง</p>
           <div className="rounded-lg border border-blue-300 bg-blue-50 p-2">
-            {currentAddress && (
+            {currentAddress ? (
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <div className="flex gap-2">
@@ -108,6 +145,12 @@ const CartPage = () => {
                   </div>
                 </div>
                 <p>{`${currentAddress.addressLine} ตำบล${currentAddress.subDistrict}, อำเภอ${currentAddress.district} จังหวัด${currentAddress.province} ${currentAddress.postalCode}`}</p>
+              </div>
+            ) : (
+              <div>
+                <a href="/user/address" className="text-red-500">
+                  เพิ่มที่อยู่
+                </a>
               </div>
             )}
           </div>
@@ -140,10 +183,13 @@ const CartPage = () => {
           </div>
           <div className="flex justify-between gap-2">
             <p className="font-semibold">ยอดรวม:</p>
-            <p>{total}฿</p>
+            <p>{total.toLocaleString()}฿</p>
           </div>
           <div className="mt-10 flex justify-between gap-2">
-            <button className="w-full cursor-pointer rounded-full bg-black px-5 py-2 text-white">
+            <button
+              onClick={() => handleSubmit()}
+              className="w-full cursor-pointer rounded-full bg-black px-5 py-2 text-white"
+            >
               สั่งสินค้า
             </button>
           </div>

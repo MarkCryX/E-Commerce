@@ -15,27 +15,27 @@ const orderSchema = mongoose.Schema(
           ref: "Product",
           required: true,
         },
-        name:{
+        name: {
           type: String,
-          required: true
+          required: true,
         },
-        price:{
+        price: {
           type: Number,
-          required: true
+          required: true,
         },
         quantity: {
           type: Number,
           required: true,
-          min: 1
+          min: 1,
         },
         size: {
           type: String,
-          required: true
+          required: true,
         },
         color: {
           type: String,
-          required: true
-        }
+          required: true,
+        },
       },
     ],
     totalAmount: {
@@ -49,13 +49,22 @@ const orderSchema = mongoose.Schema(
     },
     paymentstatus: {
       type: String,
-      enum: ["รอชำระ","ชำระเสร็จสิ้น"],
-      default: "รอชำระ"
+      enum: ["รอชำระ", "ชำระเสร็จสิ้น"],
+      default: "รอชำระ",
     },
     isOrder: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    shippingAddress: {
+      name: String,
+      phone: String,
+      addressLine: String,
+      subDistrict: String,
+      district: String,
+      province: String,
+      postalCode: String,
+    },
   },
   { timestamps: true }
 );

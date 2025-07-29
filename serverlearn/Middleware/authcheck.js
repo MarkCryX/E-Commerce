@@ -43,7 +43,7 @@ exports.authCheck = async (req, res, next) => {
           message: "User not found",
         });
       }
-
+      
       // 3.4. เพิ่มข้อมูลผู้ใช้ใน Object `req`
       req.user = user;
       next();
