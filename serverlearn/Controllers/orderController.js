@@ -13,8 +13,8 @@ exports.createOrder = async (req, res) => {
 
   try {
     const userId = req.user._id; //ดึงมาจาก authcheck
-    const { products, shippingAddress } = req.body; 
-    
+    const { products, shippingAddress } = req.body;
+
     if (!shippingAddress || !shippingAddress.name || !shippingAddress.phone) {
       return res.status(400).json({ message: "ข้อมูลที่อยู่ไม่ถูกต้อง" });
     }
@@ -24,11 +24,9 @@ exports.createOrder = async (req, res) => {
 
     for (const item of products) {
       const product = await Product.findById(item.product);
-      
+
       if (!product) {
-        return res
-          .status(404)
-          .json({ message: `ไม่พบสินค้าที่มี ID: ${item.product}` });
+        return res.status(404).json({ message: `ไม่พบสินค้า` });
       }
 
       if (product.quantity < item.quantity) {
@@ -37,14 +35,14 @@ exports.createOrder = async (req, res) => {
           .json({ message: `สินค้า ${product.name} มีสต็อกไม่เพียงพอ` });
       }
 
-
       calculatedTotalAmount += product.price * item.quantity;
       orderProducts.push({
         product: product._id,
         quantity: item.quantity,
         price: product.price,
+        image: product.images[0].url,
         name: product.name,
-        size: item.size, //
+        size: item.size,
         color: item.color,
       });
 

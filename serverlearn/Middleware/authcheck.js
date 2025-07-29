@@ -32,9 +32,9 @@ exports.authCheck = async (req, res, next) => {
       // `decoded` จะมีข้อมูลที่ถูกเก็บไว้ใน token เช่น userId
 
       // 3.2. ค้นหาข้อมูลผู้ใช้จากฐานข้อมูล
-      const user = await User.findById(decoded.userId).select(
-        "-password -refreshToken"
-      ); // ดึงข้อมูลผู้ใช้ ยกเว้น password และ refreshToken
+      const user = await User.findById(decoded.userId)
+        .select("-password -refreshToken")
+        .populate("orders"); // ดึงข้อมูลผู้ใช้ ยกเว้น password และ refreshToken
 
       // 3.3. ตรวจสอบว่าพบผู้ใช้หรือไม่
       if (!user) {
@@ -43,7 +43,7 @@ exports.authCheck = async (req, res, next) => {
           message: "User not found",
         });
       }
-      
+
       // 3.4. เพิ่มข้อมูลผู้ใช้ใน Object `req`
       req.user = user;
       next();

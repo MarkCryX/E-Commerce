@@ -145,7 +145,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-
   // ไว้จัดการ accesstoken หมดอายุ และได้รับ 401 มาจาก authcheck จากนั้นก็จะ เรียก refreshtoken และทำการส่งข้อมูลไปที่ apiที่ ตอบกลับ 401ไปอีกรอบ ให้สำเร็จ
   useEffect(() => {
     // ตรวจสอบว่า interceptor ยังไม่ได้ถูกตั้งค่าจริง ๆ (ไม่ว่าจะเป็นครั้งแรก หรือหลังจาก StrictMode remount)
