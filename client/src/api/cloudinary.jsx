@@ -1,6 +1,8 @@
 // api/clouinary.jsx
 import axios from "axios";
 
+const API_BASE = import.meta.env.VITE_BACK_END_URL;
+
 export const uploadImageToCloudinary = async (file, onProgress) => {
   // สร้าง FormData object เพื่อส่งไฟล์
   const formData = new FormData();
@@ -8,7 +10,7 @@ export const uploadImageToCloudinary = async (file, onProgress) => {
 
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_BACK_END_URL}/api/upload-images`,
+      `${API_BASE}/api/upload-images`,
       formData,
       {
         headers: {
@@ -43,7 +45,7 @@ export const uploadImageToCloudinary = async (file, onProgress) => {
 export const deleteImageFromCloudinary = async (publicId) => {
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_BACK_END_URL}/api/remove-image`, // URL ของ Backend API สำหรับลบรูปภาพ
+      `${API_BASE}/api/remove-image`, // URL ของ Backend API สำหรับลบรูปภาพ
       { public_id: publicId }, // ส่ง public_id ไปใน body ของ request
       {
         withCredentials: true,

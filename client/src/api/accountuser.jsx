@@ -1,14 +1,12 @@
 import axios from "axios";
 
+const API_BASE = `${import.meta.env.VITE_BACK_END_URL}/api/users/me/address`;
+
 export const createAddress = async (formData) => {
   try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACK_END_URL}/api/users/me/address`,
-      formData,
-      {
-        withCredentials: true,
-      },
-    );
+    const response = await axios.post(API_BASE, formData, {
+      withCredentials: true,
+    });
 
     return response.data;
   } catch (error) {
@@ -24,13 +22,9 @@ export const createAddress = async (formData) => {
 
 export const updateAdress = async (formData, addressId) => {
   try {
-    const response = await axios.put(
-      `${import.meta.env.VITE_BACK_END_URL}/api/users/me/address/${addressId}`,
-      formData,
-      {
-        withCredentials: true,
-      },
-    );
+    const response = await axios.put(`${API_BASE}/${addressId}`, formData, {
+      withCredentials: true,
+    });
 
     return response.data;
   } catch (error) {
@@ -47,7 +41,7 @@ export const updateAdress = async (formData, addressId) => {
 export const updateIsDefaultAddress = async (addressId) => {
   try {
     const response = await axios.put(
-      `${import.meta.env.VITE_BACK_END_URL}/api/users/me/address/default/${addressId}`,
+      `${API_BASE}/default/${addressId}`,
       {},
       {
         withCredentials: true,
@@ -69,12 +63,9 @@ export const updateIsDefaultAddress = async (addressId) => {
 
 export const deleteAddress = async (addressId) => {
   try {
-    const response = await axios.delete(
-      `${import.meta.env.VITE_BACK_END_URL}/api/users/me/address/${addressId}`,
-      {
-        withCredentials: true,
-      },
-    );
+    const response = await axios.delete(`${API_BASE}/${addressId}`, {
+      withCredentials: true,
+    });
 
     return response.data;
   } catch (error) {

@@ -1,10 +1,10 @@
 import axios from "axios";
 
+const API_BASE = `${import.meta.env.VITE_BACK_END_URL}/api/category`;
+
 export const fetchCategory = async () => {
   try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACK_END_URL}/api/category`,
-    );
+    const response = await axios.get(API_BASE);
     return response.data.categories || [];
   } catch (error) {
     console.error("Error ไม่สามามารถดึงข้อมูลหมวดหมู่มาได้:", error);
@@ -14,9 +14,7 @@ export const fetchCategory = async () => {
 
 export const fetchCategoryById = async (id) => {
   try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACK_END_URL}/api/category/${id}`,
-    );
+    const response = await axios.get(`${API_BASE}/${id}`);
     return response.data.categories || [];
   } catch (error) {
     console.error("Error ไม่สามามารถดึงข้อมูลหมวดหมู่ตาม ID ได้:", error);
@@ -26,13 +24,9 @@ export const fetchCategoryById = async (id) => {
 
 export const createCategory = async (formcategory) => {
   try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACK_END_URL}/api/category`,
-      formcategory,
-      {
-        withCredentials: true,
-      },
-    );
+    const response = await axios.post(API_BASE, formcategory, {
+      withCredentials: true,
+    });
     return response.data.message || "สร้างหมวดหมู่สำเร็จ";
   } catch (error) {
     const errors = error?.response?.data?.errors;
@@ -46,11 +40,9 @@ export const createCategory = async (formcategory) => {
 
 export const updateCategory = async (id, formcategory) => {
   try {
-    const response = await axios.put(
-      `${import.meta.env.VITE_BACK_END_URL}/api/category/${id}`,
-      formcategory,
-      { withCredentials: true },
-    );
+    const response = await axios.put(`${API_BASE}/${id}`, formcategory, {
+      withCredentials: true,
+    });
 
     return response.data.message || "อัพเดทหมวดหมู่สำเร็จ";
   } catch (error) {
@@ -65,10 +57,9 @@ export const updateCategory = async (id, formcategory) => {
 
 export const deleteCategory = async (id) => {
   try {
-    const response = await axios.delete(
-      `${import.meta.env.VITE_BACK_END_URL}/api/category/${id}`,
-      { withCredentials: true },
-    );
+    const response = await axios.delete(`${API_BASE}/${id}`, {
+      withCredentials: true,
+    });
 
     return response.data.message || "ลบหมวดหมู่สำเร็จ";
   } catch (error) {
