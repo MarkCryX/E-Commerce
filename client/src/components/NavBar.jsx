@@ -125,6 +125,14 @@ function NavBar({ isAuthenticated, user, logout }) {
                       บัญชีของฉัน
                     </NavLink>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NavLink
+                      to="/user/orders"
+                      className="w-full cursor-pointer text-left"
+                    >
+                      คำสั่งซื้อของฉัน
+                    </NavLink>
+                  </DropdownMenuItem>
                   {user?.role === "admin" && (
                     <DropdownMenuItem asChild>
                       <NavLink to="/admin" className="cursor-pointer">
