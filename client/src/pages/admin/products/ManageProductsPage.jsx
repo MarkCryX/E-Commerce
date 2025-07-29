@@ -1,18 +1,17 @@
 // src/pages/admin/ManageProductsPage.jsx
 import { useState, useEffect } from "react";
-import { fetchProducts } from "../../../api/product";
-import ProductCardAdmin from "../../../components/Product/ProductCardAdmin";
+import { fetchProducts, deleteProduct } from "../../../api/product";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ManageProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-
+  console.log(products);
+  
   const loadProducts = async () => {
     try {
-      // await new Promise((resolve) => setTimeout(resolve, 5000));
       const data = await fetchProducts();
       setProducts(data);
     } catch (err) {
@@ -26,45 +25,78 @@ const ManageProductsPage = () => {
     loadProducts();
   }, []);
 
+  const handleDelete = async (productId, productName) => {
+    const confirmDelete = window.confirm(`คุณแน่ใจว่าต้องการลบ "${productName}" หรือไม่?`);
+    if (!confirmDelete) return;
+
+    try {
+      await deleteProduct(productId);
+      toast.success("ลบสินค้าสำเร็จ");
+      loadProducts();
+    } catch (err) {
+      toast.error("ลบสินค้าไม่สำเร็จ");
+    }
+  };
+
   return (
     <div className="ml-3 rounded-lg bg-white p-6 shadow-md">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-800">จัดการสินค้า</h1>
-        <div>
-          <Link
-            to="/admin/create-product"
-            className="cursor-pointer rounded-2xl bg-green-500 p-2 text-lg text-white transition-colors hover:bg-green-600"
-          >
-            เพิ่มสินค้า
-          </Link>
-        </div>
+        <Link
+          to="/admin/create-product"
+          className="cursor-pointer rounded-2xl bg-green-500 p-2 text-lg text-white transition-colors hover:bg-green-600"
+        >
+          เพิ่มสินค้า
+        </Link>
       </div>
+
       {loading ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-          {Array(5)
-            .fill()
-            .map((_, i) => (
-              <div
-                key={i}
-                className="h-48 animate-pulse rounded-lg bg-gray-300"
-              />
-            ))}
-        </div>
+        <p className="text-gray-500">กำลังโหลดสินค้า...</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : products.length === 0 ? (
-        <p className="col-span-full text-center text-gray-500">
-          ไม่มีสินค้า
-        </p>
+        <p className="text-center text-gray-500">ไม่มีสินค้า</p>
       ) : (
-        <div className="grid max-h-screen grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {products.map((product) => (
-            <ProductCardAdmin
-              key={product._id}
-              products={product}
-              onDeleteSuccess={loadProducts}
-            />
-          ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto border text-left text-sm text-gray-700">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-4 py-2">ลำดับ</th>
+                <th className="border px-4 py-2">รหัสสินค้า</th>
+                <th className="border px-4 py-2">ชื่อสินค้า</th>
+                <th className="border px-4 py-2">คงเหลือ</th>
+                <th className="border px-4 py-2">ราคา</th>
+                <th className="border px-4 py-2">หมวดหมู่</th>
+                <th className="border px-4 py-2">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product, idx) => (
+                <tr key={product._id} className="hover:bg-gray-50">
+                  <td className="border px-4 py-2">{idx + 1}</td>
+                  <td className="border px-4 py-2">{product._id}</td>
+                  <td className="border px-4 py-2">{product.name}</td>
+                  <td className="border px-4 py-2">{product.quantity} ชิ้น</td>
+                  <td className="border px-4 py-2">{product.price.toLocaleString()} บาท</td>
+                  <td className="border px-4 py-2">{product.category.name}</td>
+                  <td className="border px-4 py-2 flex justify-center gap-10">
+                    <Link
+                      to={`/admin/edit-product/${product._id}`}
+                      className="rounded bg-yellow-400 px-3 py-1 text-white hover:bg-yellow-500"
+                    >
+                      แก้ไข
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(product._id, product.name)}
+                      className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+                    >
+                      ลบ
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
