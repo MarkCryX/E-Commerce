@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
   const { login, loading } = useAuth();
   const [localLoading, setLocalLoading] = useState(false);
 
@@ -13,7 +13,7 @@ const LoginPage = () => {
     e.preventDefault();
     setLocalLoading(true);
     try {
-      // await new Promise((resolve) => setTimeout(resolve, 1000));
+      // await new Promise((resolve) => setTimeout(resolve, 50000));
       const result = await login(email, password);
       if (result.success) {
         toast.success(result.message);
@@ -27,15 +27,11 @@ const LoginPage = () => {
     }
   };
 
-  // if (loading) {
-  //   return <div className="mt-10 text-center">กำลังตรวจสอบสถานะ...</div>; // หรือ spinner
-  // }
-
   return (
-    <div className="flex justify-center mt-30">
+    <div className="mt-30 flex justify-center">
       <form
         onSubmit={handleSubmit}
-        className="mb-4 rounded-2xl bg-white py-20 shadow-md p-10"
+        className="mb-4 rounded-2xl bg-white p-10 py-20 shadow-md"
       >
         <h1 className="text-center text-2xl font-semibold">ล็อกอิน</h1>
         <div className="mx-auto mt-6 max-w-md">
@@ -68,26 +64,10 @@ const LoginPage = () => {
               disabled={localLoading} // ปิดปุ่มตอนโหลด
             >
               {localLoading ? (
-                <svg
-                  className="mx-auto h-5 w-5 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  ></path>
-                </svg>
+                <div className="flex items-center gap-2">
+                  <FaSpinner className="animate-spin" />
+                  <span>Loading...</span>
+                </div>
               ) : (
                 "ล็อกอิน"
               )}
@@ -98,6 +78,5 @@ const LoginPage = () => {
     </div>
   );
 };
-
 
 export default LoginPage;
