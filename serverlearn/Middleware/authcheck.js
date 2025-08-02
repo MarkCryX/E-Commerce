@@ -40,7 +40,7 @@ exports.authCheck = async (req, res, next) => {
       if (!user) {
         return res.status(401).json({
           isAuthenticated: false,
-          message: "User not found",
+          message: "ไม่พบผู้ใช้งาน",
         });
       }
 
@@ -80,7 +80,7 @@ exports.isAdmin = (req, res, next) => {
   } else {
     // 2. ถ้าไม่ใช่ admin
     return res.status(403).json({
-      message: "Admin access required",
+      message: " ต้องมีสิทธิ์เข้าถึงในฐานะผู้ดูแลระบบ",
       shouldRefresh: false,
     });
   }

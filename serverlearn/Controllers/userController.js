@@ -114,7 +114,7 @@ exports.login = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Login successful", user: userWithoutPassword });
+      .json({ message: "ล็อกอินสำเร็จ", user: userWithoutPassword });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error occurred" });

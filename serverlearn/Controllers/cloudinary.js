@@ -15,7 +15,7 @@ exports.createImages = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  
+
   try {
     const files = req.files;
     if (!files || files.length === 0) {
@@ -54,7 +54,6 @@ exports.createImages = async (req, res, next) => {
 
 exports.removeImage = async (req, res, next) => {
   try {
-    // public_id จะถูกส่งมาจาก frontend ใน req.body
     const { public_id } = req.body;
 
     if (!public_id) {
@@ -67,9 +66,7 @@ exports.removeImage = async (req, res, next) => {
     const result = await cloudinary.uploader.destroy(public_id);
 
     if (result.result === "ok") {
-      res
-        .status(200)
-        .json({ message: "ลบรูปภาพจาก Cloudinary สำเร็จ", public_id });
+      res.status(200).json({ message: "ลบรูปภาพสำเร็จ", public_id });
     } else {
       // กรณี Cloudinary รายงานว่าไม่สำเร็จ (เช่น public_id ไม่ถูกต้อง)
       res.status(404).json({
