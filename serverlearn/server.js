@@ -15,7 +15,7 @@ app.use(
   cors({
     origin: ["http://localhost:5173"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type"],
   })
 );
 app.use(helmet());
