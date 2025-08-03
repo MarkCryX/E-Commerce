@@ -2,6 +2,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const OrderPage = () => {
   const { user, loading } = useAuth();
+  const { orders } = user;
 
   if (loading) return <p>กำลังโหลด...</p>;
 
@@ -11,13 +12,13 @@ const OrderPage = () => {
         รายการคำสั่งซื้อของคุณ
       </h1>
 
-      {user.orders.length === 0 ? (
+      {orders.length === 0 ? (
         <p className="text-gray-600">คุณยังไม่มีคำสั่งซื้อ</p>
       ) : (
-        user.orders.map((order) => (
+        orders.map((order) => (
           <div
             key={order._id}
-            className="mb-5 mt-3 rounded-xl border p-4 shadow-sm transition hover:shadow-md"
+            className="mt-3 mb-5 rounded-xl border p-4 shadow-sm transition hover:shadow-md"
           >
             <div className="mb-2 flex justify-between">
               <div>
