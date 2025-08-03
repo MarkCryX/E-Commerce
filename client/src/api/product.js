@@ -2,9 +2,9 @@ import axios from "axios";
 
 const API_BASE = `${import.meta.env.VITE_BACK_END_URL}/api/products`;
 
-export const fetchProducts = async () => {
+export const fetchProducts = async (page = 1, limit = 20) => {
   try {
-    const response = await axios.get(API_BASE);
+    const response = await axios.get(`${API_BASE}?page=${page}&limit=${limit}`);
     return response.data || [];
   } catch (error) {
     console.error("Error fetching products:", error);
