@@ -49,15 +49,15 @@ const ProductPage = () => {
   }, [page]);
 
   return (
-    <div className="mx-10">
-      <div className="bg-green-500 py-5 text-end">
+    <div className="mx-10 pb-10">
+      <div className="px-5 py-5 text-end">
         <p>ตัวซ่อนfilter กับ เรียงตาม</p>
       </div>
       <div className="grid grid-cols-[1fr_5fr]">
-        <div className="bg-blue-500 py-5 pl-5">
+        <div className="py-5 pl-5">
           <h2>Filter Product</h2>
         </div>
-        <div className="grid grid-cols-4 gap-5 bg-amber-400 px-5 py-5">
+        <div className="grid grid-cols-4 gap-5 px-5 py-5">
           {products.map((product, index) => {
             if (products.length === index + 1) {
               return (
