@@ -10,13 +10,14 @@ exports.readproducts = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20; // จำนวนต่อหน้า
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({})
+    const products = await Product.find({ quantity: { $gt: 0 } }) //ดึงเฉพาะสินค้าที่มี quantity มากกว่า 0
       .populate("category", "name")
       .skip(skip) // ข้ามสินค้าเก่า
       .limit(limit) // ดึงเท่าที่ต้องการ
-      .sort({ createdAt: -1 }); // สินค้าใหม่อยู่บน
+      .sort({ createdAt: -1 }) // สินค้าใหม่อยู่บน
+      .select("-__v -quantity");
 
-    const total = await Product.countDocuments(); // นับสินค้าทั้งหมด
+    const total = await Product.countDocuments({ quantity: { $gt: 0 } }); // นับสินค้าที่มี quantity มากกว่า 0
 
     res.status(200).json({
       products,
