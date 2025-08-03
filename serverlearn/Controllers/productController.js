@@ -6,8 +6,24 @@ const cloudinary = require("cloudinary").v2;
 // ดึงข้อมูล products ทั้งหมด
 exports.readproducts = async (req, res) => {
   try {
-    const products = await Product.find({}).populate("category", "name");
-    res.status(200).json(products);
+    const page = parseInt(req.query.page) || 1; // หน้าเริ่มต้น
+    const limit = parseInt(req.query.limit) || 20; // จำนวนต่อหน้า
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find({})
+      .populate("category", "name")
+      .skip(skip) // ข้ามสินค้าเก่า
+      .limit(limit) // ดึงเท่าที่ต้องการ
+      .sort({ createdAt: -1 }); // สินค้าใหม่อยู่บน
+
+    const total = await Product.countDocuments(); // นับสินค้าทั้งหมด
+
+    res.status(200).json({
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
