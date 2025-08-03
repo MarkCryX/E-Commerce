@@ -22,7 +22,6 @@ const CartPage = () => {
   const address = user.addresses;
   const currentAddress =
     selectedAddress || address.find((address) => address.isDefault);
-
   const total = cart.reduce(
     (total, item) => item.quantity * item.price + total,
     0,
