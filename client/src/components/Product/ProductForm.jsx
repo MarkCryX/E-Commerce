@@ -305,14 +305,22 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
                   value={form.category}
                   onChange={handleChange}
                 >
-                  <option value="" disabled>
-                    เลือกหมวดหมู่
-                  </option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
+                  {categories && categories.length > 0 ? (
+                    <>
+                      <option value="" disabled>
+                        เลือกหมวดหมู่
+                      </option>
+                      {categories.map((cat) => (
+                        <option key={cat._id} value={cat._id}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </>
+                  ) : (
+                    <option value="" disabled>
+                      ไม่มีหมวดหมู่ให้เลือก
                     </option>
-                  ))}
+                  )}
                 </select>
               </div>
               <div className="mb-6">
