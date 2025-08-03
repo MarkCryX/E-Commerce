@@ -6,15 +6,15 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import HomePage from "../pages/HomePage";
+import HomePage from "../pages/public/HomePage";
 import MainLayout from "../layouts/MainLayout";
-import AboutPage from "../pages/AboutPage";
+import AboutPage from "../pages/public/AboutPage";
 // import LearnPage from "./pages/LearnPage";
 import NotFoundPage from "../pages/NotFoundPage";
 // import EcomPage from "./pages/EcomPage";
 import Register from "../pages/RegisterPage";
-import ProductPage from "@/pages/ProductPage";
-import ProductIdPage from "../pages/ProductIdPage";
+import ProductPage from "@/pages/public/ProductPage";
+import ProductIdPage from "../pages/public/ProductIdPage";
 import LoginPage from "../pages/LoginPage";
 import { AuthProvider } from "../context/AuthContext"; // Import AuthProvider
 import PrivateRoute from "./PrivateRoute";
