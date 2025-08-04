@@ -3,7 +3,8 @@ const Product = require("../Models/Product");
 const { validationResult } = require("express-validator");
 const cloudinary = require("cloudinary").v2;
 
-// ดึงข้อมูล products ทั้งหมด
+// --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
+
 exports.readproducts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; // หน้าเริ่มต้น
@@ -31,8 +32,45 @@ exports.readproducts = async (req, res) => {
   }
 };
 
-// ดึงข้อมูล product ตาม id ที่ส่งมา
 exports.readproductById = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const id = req.params.id;
+
+    const product = await Product.findById(id)
+      .populate("category", "name")
+      .select("-__v -quantity");
+
+    if (!product) {
+      return res.status(404).json({ message: "ไม่พบสินค้า" });
+    }
+
+    res.status(200).json(product);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+  }
+};
+
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
+
+exports.readAllProductsAdmin = async (req, res) => {
+  try {
+    const products = await Product.find({}).populate("category", "name");
+
+    res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+  }
+};
+
+exports.readProductByIdAdmin = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {

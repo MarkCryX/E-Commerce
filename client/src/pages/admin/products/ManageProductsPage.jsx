@@ -1,21 +1,23 @@
 // src/pages/admin/ManageProductsPage.jsx
 import { useState, useEffect } from "react";
-import { fetchProducts, deleteProduct } from "../../../api/product";
+import { fetchProductsAdmin, deleteProduct } from "../../../api/product";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 const ManageProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  console.log(products);
-  
+
   const loadProducts = async () => {
     try {
-      const data = await fetchProducts();
+      const data = await fetchProductsAdmin();
       setProducts(data);
     } catch (err) {
-      setError("Failed to fetch products");
+      const msg = extractErrorMessage(error);
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -26,7 +28,9 @@ const ManageProductsPage = () => {
   }, []);
 
   const handleDelete = async (productId, productName) => {
-    const confirmDelete = window.confirm(`คุณแน่ใจว่าต้องการลบ "${productName}" หรือไม่?`);
+    const confirmDelete = window.confirm(
+      `คุณแน่ใจว่าต้องการลบ "${productName}" หรือไม่?`,
+    );
     if (!confirmDelete) return;
 
     try {
@@ -77,9 +81,11 @@ const ManageProductsPage = () => {
                   <td className="border px-4 py-2">{product._id}</td>
                   <td className="border px-4 py-2">{product.name}</td>
                   <td className="border px-4 py-2">{product.quantity} ชิ้น</td>
-                  <td className="border px-4 py-2">{product.price.toLocaleString()} บาท</td>
+                  <td className="border px-4 py-2">
+                    {product.price.toLocaleString()} บาท
+                  </td>
                   <td className="border px-4 py-2">{product.category.name}</td>
-                  <td className="border px-4 py-2 flex justify-center gap-10">
+                  <td className="flex justify-center gap-10 border px-4 py-2">
                     <Link
                       to={`/admin/edit-product/${product._id}`}
                       className="rounded bg-yellow-400 px-3 py-1 text-white hover:bg-yellow-500"

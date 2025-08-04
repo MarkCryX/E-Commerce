@@ -11,6 +11,8 @@ import "swiper/css/thumbs";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "@/context/CartContext";
+import { FaCartPlus } from "react-icons/fa";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 const ProductIdPage = () => {
   const { addToCart } = useCart();
@@ -31,9 +33,9 @@ const ProductIdPage = () => {
         setProduct(data);
       } catch (error) {
         const msg = extractErrorMessage(error);
-        console.error("Error fetching product for edit:", error);
         setError(msg);
         toast.error(msg);
+        navigate("/not-found");
       } finally {
         setLoading(false);
       }
@@ -43,12 +45,6 @@ const ProductIdPage = () => {
       loadProduct();
     }
   }, [id]);
-
-  useEffect(() => {
-    if (!loading && !product) {
-      navigate("/not-found");
-    }
-  }, [loading, product, navigate]);
 
   if (loading) {
     return (
@@ -89,134 +85,119 @@ const ProductIdPage = () => {
   };
 
   return (
-    <div className="container mx-auto grid min-h-screen grid-cols-1 gap-5 pt-5 sm:grid-cols-1 md:grid-cols-2">
-      {product.images && product.images.length > 0 ? (
-        <div>
-          <Swiper
-            spaceBetween={10}
-            slidesPerView={1}
-            navigation={true}
-            pagination={{ clickable: true }}
-            thumbs={{ swiper: thumbsSwiper }}
-            modules={[Navigation, Pagination, Thumbs]}
-            className="rounded-lg bg-white shadow"
-          >
-            {product.images.map((image, index) => (
-              <SwiperSlide key={index}>
-                <div className="relative h-[20rem] w-full rounded-lg sm:h-[25rem] md:h-[30rem] lg:h-[35rem] xl:h-[40rem]">
+    <>
+      <div className="container mx-auto grid min-h-screen grid-cols-1 gap-5 pt-5 sm:grid-cols-1 md:grid-cols-2">
+        {product.images && product.images.length > 0 ? (
+          <div>
+            <Swiper
+              spaceBetween={10}
+              slidesPerView={1}
+              navigation={true}
+              pagination={{ clickable: true }}
+              thumbs={{ swiper: thumbsSwiper }}
+              modules={[Navigation, Pagination, Thumbs]}
+              className="rounded-lg bg-white shadow"
+            >
+              {product.images.map((image, index) => (
+                <SwiperSlide key={index}>
+                  <div className="relative h-[20rem] w-full rounded-lg sm:h-[25rem] md:h-[30rem] lg:h-[35rem] xl:h-[40rem]">
+                    <img
+                      src={image.url}
+                      alt={`Room image ${index + 1}`}
+                      className="h-full w-full rounded-lg object-contain"
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            {/* Thumbnail Swiper */}
+            <Swiper
+              onSwiper={setThumbsSwiper}
+              spaceBetween={10}
+              slidesPerView={4}
+              watchSlidesProgress={true}
+              modules={[Thumbs]}
+              className="mt-4"
+            >
+              {product.images.map((image, index) => (
+                <SwiperSlide key={index}>
                   <img
                     src={image.url}
-                    alt={`Room image ${index + 1}`}
-                    className="h-full w-full rounded-lg object-contain"
+                    alt={`Thumb ${index + 1}`}
+                    className="h-20 w-full cursor-pointer rounded-lg bg-white/50 object-contain shadow"
                   />
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-          {/* Thumbnail Swiper */}
-          <Swiper
-            onSwiper={setThumbsSwiper}
-            spaceBetween={10}
-            slidesPerView={4}
-            watchSlidesProgress={true}
-            modules={[Thumbs]}
-            className="mt-4"
-          >
-            {product.images.map((image, index) => (
-              <SwiperSlide key={index}>
-                <img
-                  src={image.url}
-                  alt={`Thumb ${index + 1}`}
-                  className="h-20 w-full cursor-pointer rounded-lg bg-white/50 object-contain shadow"
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center">
-          <p className="text-4xl font-semibold text-gray-500">ไม่มีรูป</p>
-        </div>
-      )}
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            <p className="text-4xl font-semibold text-gray-500">ไม่มีรูป</p>
+          </div>
+        )}
 
-      <div className="flex flex-col justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">{product.name}</h1>
-          <p className="text-gray-500">{product.category?.name}</p>
-          <p className="text-2xl">{product.price.toLocaleString()} ฿</p>
+        <div className="flex flex-col justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">{product.name}</h1>
+            <p className="text-gray-500">{product.category?.name}</p>
+            <p className="text-2xl">{product.price.toLocaleString()} ฿</p>
 
-          <div className="mt-10">
-            <p className="mb-5 text-[18px] font-semibold">เลือกสี</p>
+            <div className="mt-10">
+              <p className="mb-5 text-[18px] font-semibold">เลือกสี</p>
+              <div className="grid grid-cols-6 gap-3">
+                {product.colors.map((color, index) => (
+                  <div
+                    key={index}
+                    className={`cursor-pointer rounded-md border p-4 text-center transition duration-300 ${
+                      selectedColor === color
+                        ? "border-black bg-gray-100"
+                        : "border-gray-300 bg-white"
+                    }`}
+                    onClick={() => setSelectedColor(color)}
+                  >
+                    <p>{color}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="">
+            <p className="mb-5 text-[18px] font-semibold">เลือกไซส์</p>
             <div className="grid grid-cols-6 gap-3">
-              {product.colors.map((color, index) => (
+              {product.sizes.map((size, index) => (
                 <div
                   key={index}
                   className={`cursor-pointer rounded-md border p-4 text-center transition duration-300 ${
-                    selectedColor === color
+                    selectedSize === size
                       ? "border-black bg-gray-100"
                       : "border-gray-300 bg-white"
                   }`}
-                  onClick={() => setSelectedColor(color)}
+                  onClick={() => setSelectedSize(size)}
                 >
-                  <p>{color}</p>
+                  <p>{size}</p>
                 </div>
               ))}
             </div>
           </div>
-        </div>
 
-        <div className="">
-          <p className="mb-5 text-[18px] font-semibold">เลือกไซส์</p>
-          <div className="grid grid-cols-6 gap-3">
-            {product.sizes.map((size, index) => (
-              <div
-                key={index}
-                className={`cursor-pointer rounded-md border p-4 text-center transition duration-300 ${
-                  selectedSize === size
-                    ? "border-black bg-gray-100"
-                    : "border-gray-300 bg-white"
-                }`}
-                onClick={() => setSelectedSize(size)}
-              >
-                <p>{size}</p>
-              </div>
-            ))}
+          <div className="font-semibold">
+            <button
+              onClick={() => handleAddCart()}
+              className="mt-10 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-black p-3 text-white hover:bg-gray-500 sm:mt-10 md:mt-0"
+            >
+              <FaCartPlus className="text-xl" />
+              ใส่ตะกร้า
+            </button>
           </div>
         </div>
 
-        <div className="font-semibold">
-          <button
-            onClick={() => handleAddCart()}
-            className="mt-10 flex w-full cursor-pointer justify-center gap-2 rounded-lg bg-black p-3 text-white hover:bg-gray-500 sm:mt-10 md:mt-0"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="25"
-              viewBox="0 0 24 24"
-              className="text-white"
-            >
-              <path
-                fill="currentColor"
-                fillRule="evenodd"
-                d="M1.566 4a.75.75 0 0 1 .75-.75h1.181a2.25 2.25 0 0 1 2.228 1.937l.061.435h13.965a2.25 2.25 0 0 1 2.063 3.148l-2.668 6.128a2.25 2.25 0 0 1-2.063 1.352H7.722a2.25 2.25 0 0 1-2.228-1.937L4.24 5.396a.75.75 0 0 0-.743-.646h-1.18a.75.75 0 0 1-.75-.75m4.431 3.122l.982 6.982a.75.75 0 0 0 .743.646h9.361a.75.75 0 0 0 .688-.45l2.667-6.13a.75.75 0 0 0-.687-1.048z"
-                clipRule="evenodd"
-              />
-              <path
-                fill="currentColor"
-                d="M6.034 19.5a1.75 1.75 0 1 1 3.5 0a1.75 1.75 0 0 1-3.5 0m10.286-1.75a1.75 1.75 0 1 0 0 3.5a1.75 1.75 0 0 0 0-3.5"
-              />
-            </svg>
-            ใส่ตะกร้า
-          </button>
+        <div>
+          <h3 className="mt-5 text-xl font-semibold">รายละเอียดสินค้า</h3>
+          <p>{product.description}</p>
         </div>
       </div>
-
-      <div>
-        <h3 className="mt-5 text-xl font-semibold">รายละเอียดสินค้า</h3>
-        <p>{product.description}</p>
-      </div>
-    </div>
+    </>
   );
 };
 

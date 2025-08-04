@@ -6,23 +6,37 @@ const {
   readproductById,
   updateproduct,
   deleteproduct,
+  readAllProductsAdmin,
+  readProductByIdAdmin,
 } = require("../Controllers/productController");
 const router = express.Router();
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
-const { body, param, validationResult } = require("express-validator");
+const { param } = require("express-validator");
 const { productValidationRules } = require("../validations/productValidation");
 
-router.get("/products", readproducts);
+// --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 
+router.get("/products", readproducts);
 router.get(
   "/products/:id",
   [param("id").isMongoId().withMessage("ID สินค้าไม่ถูกต้อง")],
-  // authCheck,
   readproductById
 );
 
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
+
+router.get("/admin/products", authCheck, isAdmin, readAllProductsAdmin);
+
+router.get(
+  "/admin/products/:id",
+  [param("id").isMongoId().withMessage("ID สินค้าไม่ถูกต้อง")],
+  authCheck,
+  isAdmin,
+  readProductByIdAdmin
+);
+
 router.post(
-  "/products",
+  "/admin/products",
   productValidationRules,
   authCheck,
   isAdmin,
@@ -30,7 +44,7 @@ router.post(
 );
 
 router.put(
-  "/products/:id",
+  "/admin/products/:id",
   [param("id").isMongoId().withMessage("ID สินค้าไม่ถูกต้อง")],
   productValidationRules,
   authCheck,
@@ -39,7 +53,7 @@ router.put(
 );
 
 router.delete(
-  "/products/:id",
+  "/admin/products/:id",
   [param("id").isMongoId().withMessage("ID สินค้าไม่ถูกต้อง")],
   authCheck,
   isAdmin,
