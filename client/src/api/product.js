@@ -5,9 +5,11 @@ const API_BASE_ADMIN = `${import.meta.env.VITE_BACK_END_URL}/api/admin/products`
 
 // --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 
-export const fetchProducts = async (page = 1, limit = 20) => {
+export const fetchProducts = async (page = 1, limit = 20, sortBy = "createdAt_desc") => {
   try {
-    const response = await axios.get(`${API_BASE}?page=${page}&limit=${limit}`);
+    const response = await axios.get(
+      `${API_BASE}?page=${page}&limit=${limit}&sortBy=${sortBy}`,
+    );
     return response.data || [];
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -33,7 +35,7 @@ export const fetchProductById = async (id) => {
 
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 
-export const fetchProductsAdmin = async (page = 1, limit = 20) => {
+export const fetchProductsAdmin = async () => {
   try {
     const response = await axios.get(API_BASE_ADMIN, {
       withCredentials: true,
