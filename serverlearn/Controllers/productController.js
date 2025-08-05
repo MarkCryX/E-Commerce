@@ -10,6 +10,9 @@ exports.readproducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // หน้าเริ่มต้น
     const limit = parseInt(req.query.limit) || 20; // จำนวนต่อหน้า
     const sortBy = req.query.sortBy || "createdAt_desc";
+    const categoryId = req.query.category;
+    // const minPrice = parseInt(req.query.minPrice)
+    // const maxPrice = parseInt(req.query.maxPrice)
     const skip = (page - 1) * limit;
 
     let sortOptions = {};
@@ -26,14 +29,20 @@ exports.readproducts = async (req, res) => {
         break;
     }
 
-    const products = await Product.find({ quantity: { $gt: 0 } }) //ดึงเฉพาะสินค้าที่มี quantity มากกว่า 0
+    const filterQuery = { quantity: { $gt: 0 } };
+
+    if (categoryId) {
+      filterQuery.category = categoryId;
+    }
+
+    const products = await Product.find(filterQuery) //ดึงเฉพาะสินค้าที่มี quantity มากกว่า 0
       .populate("category", "name")
       .skip(skip) // ข้ามสินค้าเก่า
       .limit(limit) // ดึงเท่าที่ต้องการ
       .sort(sortOptions) // สินค้าใหม่อยู่บน
       .select("-__v -quantity");
 
-    const total = await Product.countDocuments({ quantity: { $gt: 0 } }); // นับสินค้าที่มี quantity มากกว่า 0
+    const total = await Product.countDocuments(filterQuery); // นับสินค้าที่มี quantity มากกว่า 0
 
     res.status(200).json({
       products,

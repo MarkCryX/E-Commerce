@@ -1,17 +1,35 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { fetchProducts } from "@/api/product";
+import { fetchCategory } from "@/api/category";
 import ProductCard from "@/components/Product/ProductCard";
+import { FaFilter } from "react-icons/fa";
+import ModalFilter from "@/components/Product/ModalFilter";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import SidebarFilter from "@/components/Product/SidebarFilter";
 
 const ProductPage = () => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [sortOrder, setSortOrder] = useState("createdAt_desc");
+  const [sortBy, setSortBy] = useState("createdAt_desc");
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [modalFilter, setModalFilter] = useState(false);
   const observer = useRef();
+  const [show, setShow] = useState(true);
+
+  const handleCategoryChange = (categoryId) => {
+    // ถ้าคลิกหมวดหมู่เดิม ให้ยกเลิกการเลือก
+    const newCategory = selectedCategory === categoryId ? null : categoryId;
+    setSelectedCategory(newCategory);
+    setProducts([]);
+    setPage(1);
+    setHasMore(true);
+  };
 
   const handleSortChange = (value) => {
-    setSortOrder(value);
+    setSortBy(value);
     setProducts([]); // ล้างสินค้าเดิม
     setPage(1); // รีเซ็ตหน้า
     setHasMore(true); // รีเซ็ต hasMore
@@ -31,11 +49,25 @@ const ProductPage = () => {
     [loading, hasMore],
   );
 
+  // ดึงหมวดหมู่
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const res = await fetchCategory(); // เรียกใช้ API ดึงหมวดหมู่ทั้งหมด
+        setCategories(res);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  //ดึง product เริ่มต้นและ ดึงตาม filter ที่เลือกไว้
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const res = await fetchProducts(page, 20, sortOrder);
+        const res = await fetchProducts(page, 20, sortBy, selectedCategory);
         if (res.products.length === 0 || res.page >= res.totalPages) {
           setHasMore(false);
         }
@@ -54,27 +86,52 @@ const ProductPage = () => {
     };
 
     loadProducts();
-  }, [page, sortOrder]);
+  }, [page, sortBy, selectedCategory]); // ทำงานเมื่อ page sortBy selectedCategory มีการเปลี่ยนแปลง
+
+  useEffect(() => {
+    if (modalFilter) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    // Cleanup function: เพื่อให้แน่ใจว่า scroll จะกลับมาทำงานเมื่อ component ถูก unmount
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [modalFilter]);
 
   return (
     <div className="container mx-auto">
-      <div className="px-5 py-5 text-end">
+      <div className="flex justify-end px-5 py-5">
+        <button
+          className="flex cursor-pointer items-center gap-1 rounded-md border p-2 lg:hidden"
+          onClick={() => setModalFilter(true)}
+        >
+          ตัวกรอง
+          <FaFilter />
+        </button>
         <select
           name="sort-by"
           onChange={(e) => handleSortChange(e.target.value)}
-          value={sortOrder}
-          className="rounded-md border p-2"
+          value={sortBy}
+          className="hidden cursor-pointer rounded-md border p-2 lg:block"
         >
           <option value="createdAt_desc">เรียงตาม: ใหม่ล่าสุด</option>
           <option value="price_desc">ราคา: สูง-ต่ำ</option>
           <option value="price_asc">ราคา: ต่ำ-สูง</option>
         </select>
       </div>
-      <div className="grid grid-cols-[1fr_5fr]">
-        <div className="py-5 pl-5">
-          <h2>Filter Product</h2>
-        </div>
-        <div className="grid grid-cols-4 gap-5 px-5 py-5">
+
+      <div className="flex flex-col lg:grid lg:grid-cols-[1fr_5fr]">
+        <SidebarFilter
+          categories={categories}
+          show={show}
+          setShow={setShow}
+          handleCategoryChange={handleCategoryChange}
+          selectedCategory={selectedCategory}
+        />
+
+        <div className="grid grid-cols-2 gap-5 px-5 pb-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {products.map((product, index) => {
             if (products.length === index + 1) {
               return (
@@ -88,6 +145,18 @@ const ProductPage = () => {
           })}
         </div>
       </div>
+
+      {modalFilter && (
+        <ModalFilter
+          categories={categories}
+          selectedCategory={selectedCategory}
+          handleCategoryChange={handleCategoryChange}
+          setModalFilter={setModalFilter}
+          sortBy={sortBy}
+          handleSortChange={handleSortChange}
+        />
+      )}
+
       {loading && <p className="py-4 text-center">กำลังโหลด...</p>}
       {!hasMore && !loading && products.length > 0 && (
         <p className="py-4 text-center text-gray-500">

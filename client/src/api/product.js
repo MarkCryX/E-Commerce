@@ -5,10 +5,20 @@ const API_BASE_ADMIN = `${import.meta.env.VITE_BACK_END_URL}/api/admin/products`
 
 // --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 
-export const fetchProducts = async (page = 1, limit = 20, sortBy = "createdAt_desc") => {
+export const fetchProducts = async (page = 1, limit = 20, sortBy = "createdAt_desc",category = null) => {
   try {
+     // สร้าง URLSearchParams เพื่อจัดการ query string
+    const params = new URLSearchParams();
+    params.append('page', page);
+    params.append('limit', limit);
+    params.append('sortBy', sortBy);
+
+    // เพิ่ม category ใน query string เฉพาะเมื่อมีค่า
+    if (category) {
+      params.append('category', category);
+    }
     const response = await axios.get(
-      `${API_BASE}?page=${page}&limit=${limit}&sortBy=${sortBy}`,
+      `${API_BASE}?${params.toString()}`,
     );
     return response.data || [];
   } catch (error) {
