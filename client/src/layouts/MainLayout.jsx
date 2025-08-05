@@ -9,7 +9,7 @@ function MainLayout() {
 
   return (
     <>
-      <div className="font-kanit flex min-h-screen flex-col overflow-y-auto bg-gray-100">
+      <div className="font-kanit flex min-h-screen flex-col bg-gray-100">
         <Navbar isAuthenticated={isAuthenticated} user={user} logout={logout} />
 
         <main className="flex-1">
