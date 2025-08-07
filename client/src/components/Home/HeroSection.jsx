@@ -21,7 +21,7 @@ const LandingBanner = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center bg-gray-100">
+    <div className="flex min-h-screen items-center">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
         <div className="flex flex-col">
           <motion.div

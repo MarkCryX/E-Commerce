@@ -25,7 +25,7 @@ function NavBar({ isAuthenticated, user, logout }) {
       : "border-b-2 border-transparent hover:border-blue-500 transition-all duration-300";
 
   return (
-    <nav className="bg-gray-100 py-3">
+    <nav className="py-3">
       <div className="container mx-auto flex items-center gap-4 rounded-2xl bg-gray-300 px-4 py-3">
         {/* Left side: Logo + NavLinks */}
         <div className="flex items-center gap-4">

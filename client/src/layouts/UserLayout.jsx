@@ -10,7 +10,7 @@ const UserLayout = () => {
 
   return (
     <>
-      <div className="font-kanit flex min-h-screen flex-col overflow-y-auto bg-gray-100">
+      <div className="font-kanit flex min-h-screen flex-col overflow-y-auto">
         <Navbar isAuthenticated={isAuthenticated} user={user} logout={logout} />
 
         <main className="container mx-auto grid flex-1 grid-cols-[1fr_6fr]">
