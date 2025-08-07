@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { fetchProducts } from "@/api/product";
+import { fetchNewArrivals } from "@/api/product";
 import ProductCard from "@/components/Product/ProductCard";
 import HeroSection from "@/components/Home/HeroSection";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -14,7 +14,7 @@ function HomePage() {
 
   const fetchproduct = async () => {
     try {
-      const response = await fetchProducts();
+      const response = await fetchNewArrivals();
       setProducts(response);
     } catch (error) {
       console.error(error);
@@ -29,7 +29,7 @@ function HomePage() {
     <div className="flex flex-col">
       <HeroSection />
 
-      <section className="grid grid-cols-2 py-5 text-center sm:grid-cols-3">
+      {/* <section className="grid grid-cols-2 py-5 text-center sm:grid-cols-3">
         <div>
           <h3 className="mb-2 text-xl font-semibold">ส่งฟรีทั่วไทย</h3>
           <p>เมื่อสั่งซื้อครบ 1,000 บาท</p>
@@ -42,14 +42,13 @@ function HomePage() {
           <h3 className="mb-2 text-xl font-semibold">เปลี่ยนคืนได้</h3>
           <p>ภายใน 7 วันหากมีปัญหา</p>
         </div>
-      </section>
+      </section> */}
 
-      <div className="bg-gray-300 py-10">
-        <h1 className="mb-5 text-center text-3xl font-semibold">
-          สินค้าล่าสุด
-        </h1>
+      <div className="bg-gray-100 py-10">
         <div className="container mx-auto">
-          {/* <Swiper
+          <h1 className="mb-5 text-3xl font-semibold">สินค้ามาใหม่</h1>
+          <div className="">
+            <Swiper
             modules={[Navigation, Scrollbar, A11y]}
             spaceBetween={20}
             slidesPerView={1}
@@ -59,14 +58,15 @@ function HomePage() {
               768: { slidesPerView: 3 },
               1024: { slidesPerView: 4 },
               1280: { slidesPerView: 5 },
-            }}
-          >
-            {products.map((product) => (
-              <SwiperSlide key={product._id} className="p-3">
+              }}
+              >
+              {products.map((product) => (
+                <SwiperSlide key={product._id} className="p-3">
                 <ProductCard product={product} />
-              </SwiperSlide>
-            ))}
-          </Swiper> */}
+                </SwiperSlide>
+                ))}
+                </Swiper>
+          </div>
         </div>
       </div>
     </div>

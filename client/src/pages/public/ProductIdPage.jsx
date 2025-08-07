@@ -96,7 +96,7 @@ const ProductIdPage = () => {
               pagination={{ clickable: true }}
               thumbs={{ swiper: thumbsSwiper }}
               modules={[Navigation, Pagination, Thumbs]}
-              className="rounded-lg bg-white shadow"
+              className="rounded-lg"
             >
               {product.images.map((image, index) => (
                 <SwiperSlide key={index}>

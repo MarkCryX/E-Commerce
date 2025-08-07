@@ -43,6 +43,18 @@ export const fetchProductById = async (id) => {
   }
 };
 
+// --- Public: Highlight Products
+export const fetchNewArrivals = async () => {
+  try {
+    const response = await axios.get(`${API_BASE}/highlight/new-arrivals`);
+    return response.data || []
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+}
+
+
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 
 export const fetchProductsAdmin = async () => {
