@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { fetchOrderById } from "@/api/orders";
+import { fetchOrders } from "@/api/orders";
 
 const OrderPage = () => {
   const { user, loading } = useAuth();
@@ -10,7 +10,7 @@ const OrderPage = () => {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const response = await fetchOrderById();
+        const response = await fetchOrders();
         setOrdersData(response);
       } catch (error) {
         console.error("เกิดข้อผิดพลาดขณะโหลดคำสั่งซื้อ", error);
