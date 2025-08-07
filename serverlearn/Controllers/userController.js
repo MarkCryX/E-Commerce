@@ -58,7 +58,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).populate("orders");
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid email or password" });
@@ -275,9 +275,7 @@ exports.getUserById = async (req, res) => {
   }
 
   try {
-    const user = await User.findById(userId)
-      .populate("orders")
-      .select("-password");
+    const user = await User.findById(userId).select("-password");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

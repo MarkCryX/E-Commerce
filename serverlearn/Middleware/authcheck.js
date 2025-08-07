@@ -33,8 +33,7 @@ exports.authCheck = async (req, res, next) => {
 
       // 3.2. ค้นหาข้อมูลผู้ใช้จากฐานข้อมูล
       const user = await User.findById(decoded.userId)
-        .select("-password -refreshToken")
-        .populate("orders"); // ดึงข้อมูลผู้ใช้ ยกเว้น password และ refreshToken
+        .select("-password -refreshToken") // ดึงข้อมูลผู้ใช้ ยกเว้น password และ refreshToken
 
       // 3.3. ตรวจสอบว่าพบผู้ใช้หรือไม่
       if (!user) {
