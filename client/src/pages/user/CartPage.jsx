@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import { createOrder } from "@/api/orders";
 import { toast } from "react-toastify";
 import AddressModal from "@/components/UserAccount/Adress/AddressModal";
-
+import { useNavigate } from "react-router-dom";
 const CartPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const {
     cart,
@@ -22,17 +23,23 @@ const CartPage = () => {
   const address = user.addresses;
   const currentAddress =
     selectedAddress || address.find((address) => address.isDefault);
+  const [paymentMethod, setPaymentMethod] = useState("");
+
   const total = cart.reduce(
     (total, item) => item.quantity * item.price + total,
     0,
   );
-
   const itemcart = cart.reduce((total, item) => total + item.quantity, 0);
 
   const handleSubmit = async () => {
     try {
       if (!currentAddress) {
         toast.warn("กรุณาเลือกที่อยู่ก่อนทำการสั่งซื้อ");
+        return;
+      }
+
+      if (!paymentMethod) {
+        toast.warn("กรุณาเลือกช่องทางการชำระเงิน");
         return;
       }
 
@@ -47,11 +54,17 @@ const CartPage = () => {
         })),
         totalAmount: total,
         shippingAddress: currentAddress,
+        payment: paymentMethod,
       };
 
-      const response = await createOrder(orderData);
-      clearCart();
-      toast.success("สั่งซื้อสินค้าสำเร็จ");
+      if (orderData.payment === "cod") {
+        const response = await createOrder(orderData);
+        clearCart();
+        toast.success("สั่งซื้อสินค้าสำเร็จ");
+        navigate("/user/orders");
+      } else if (orderData.payment === "promptpay") {
+        navigate("/user/orders");
+      }
     } catch (error) {
       toast.error(error);
     }
@@ -125,7 +138,7 @@ const CartPage = () => {
         </div>
         <div className="flex h-[750px] w-full flex-col gap-2 rounded-lg bg-white p-4 shadow-md">
           <p className="mb-2 text-3xl font-semibold">สรุป</p>
-          <p>ที่อยู่ในการจัดส่ง</p>
+          <p className="mb-2 text-lg font-medium">ที่อยู่ในการจัดส่ง</p>
           <div className="rounded-lg border border-blue-300 bg-blue-50 p-2">
             {currentAddress ? (
               <div className="space-y-1 text-sm">
@@ -153,10 +166,9 @@ const CartPage = () => {
               </div>
             )}
           </div>
-
           <div className="flex justify-between border-b-1 pb-3">
             <p>{itemcart} ชิ้น:</p>
-            <p>{total}฿</p>
+            <p>{total.toLocaleString()}฿</p>
           </div>
           <div className="flex justify-between border-b-1 pb-3">
             <p>ค่าจัดส่ง:</p>
@@ -166,7 +178,7 @@ const CartPage = () => {
             <p>ภาษี:</p>
             <p>0฿</p>
           </div>
-          <div className="mt-8 flex justify-between gap-2">
+          <div className="flex justify-between gap-2">
             <input
               type="text"
               className="w-full rounded border-2 px-3 py-2"
@@ -176,25 +188,56 @@ const CartPage = () => {
               ใช้คูปอง
             </button>
           </div>
-          <div className="mt-3 flex justify-between gap-2">
-            <p>ยอดรวมย่อย:</p>
-            <p>{total}฿</p>
+          <div className="mt-1 flex justify-between gap-2">
+            <p>ส่วนลด:</p>
+            <p>0฿</p>
           </div>
-          <div className="flex justify-between gap-2">
-            <p className="font-semibold">ยอดรวม:</p>
-            <p>{total.toLocaleString()}฿</p>
+          <div className="mt-6">
+            <p className="mb-2 text-lg font-medium">เลือกช่องทางการชำระเงิน</p>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="cod"
+                  checked={paymentMethod === "cod"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                ชำระเงินปลายทาง
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="promptpay"
+                  checked={paymentMethod === "promptpay"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                พร้อมเพย์ / QR Code
+              </label>
+            </div>
           </div>
-          <div className="mt-10 flex justify-between gap-2">
+
+          <div className="mt-10 flex flex-col gap-2">
+            <div className="flex justify-between gap-2">
+              <p className="font-semibold">ยอดรวมสุทธิ:</p>
+              <p>{total.toLocaleString()}฿</p>
+            </div>
             <button
               onClick={() => handleSubmit()}
-              className="w-full cursor-pointer rounded-full bg-black px-5 py-2 text-white"
+              className={`w-full rounded-full px-5 py-2 text-white transition ${
+                itemcart === 0
+                  ? "cursor-not-allowed bg-gray-400"
+                  : "cursor-pointer bg-black hover:bg-gray-800"
+              } `}
+              disabled={itemcart === 0}
             >
-              สั่งสินค้า
+              ชำระเงิน
             </button>
           </div>
 
           <Link
-            to="/"
+            to="/product"
             className="w-full cursor-pointer rounded-full bg-white px-5 py-2 text-center shadow shadow-black/20"
           >
             เลือกสินค้าเพิ่ม
