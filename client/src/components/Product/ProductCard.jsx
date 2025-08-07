@@ -4,7 +4,7 @@ const ProductCard = ({ product }) => {
   return (
     <div className="h-full">
       <Link to={`/product/${product._id}`}>
-        <div className="h-full w-full cursor-pointer rounded-lg bg-white shadow-md transition duration-300 hover:scale-105">
+        <div className="h-full w-full cursor-pointer rounded-sm bg-white shadow-sm transition duration-300 hover:scale-105">
           {product.images?.[0]?.url ? (
             <img
               src={product.images[0].url}
@@ -17,10 +17,12 @@ const ProductCard = ({ product }) => {
             </div>
           )}
 
-          <div className="px-3 pb-3">
+          <div className="flex flex-col gap-1 px-3 pb-3">
             <h2 className="truncate text-base font-semibold text-gray-800">
               {product.name}
             </h2>
+            <p className="text-sm text-gray-500">{product.category.name}</p>
+            <p className="text-sm text-gray-500">{product.colors.length} สี</p>
             <p className="text-sm font-semibold text-gray-600">
               ฿{product.price.toLocaleString()}
             </p>
