@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-
 import { fetchNewArrivals } from "@/api/product";
-import ProductCard from "@/components/Product/ProductCard";
 import HeroSection from "@/components/Home/HeroSection";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Scrollbar, A11y } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/scrollbar";
+import ProductHighlightCard from "@/components/Product/ProductHighlightCard";
 
 function HomePage() {
   const [products, setProducts] = useState([]);
@@ -44,28 +43,28 @@ function HomePage() {
         </div>
       </section> */}
 
-      <div className="bg-gray-100 py-10">
+      <div className="">
         <div className="container mx-auto">
           <h1 className="mb-5 text-3xl font-semibold">สินค้ามาใหม่</h1>
           <div className="">
             <Swiper
-            modules={[Navigation, Scrollbar, A11y]}
-            spaceBetween={20}
-            slidesPerView={1}
-            scrollbar={false}
-            breakpoints={{
-              640: { slidesPerView: 2 },
-              768: { slidesPerView: 3 },
-              1024: { slidesPerView: 4 },
-              1280: { slidesPerView: 5 },
+              modules={[Navigation, Scrollbar, A11y]}
+              spaceBetween={20}
+              slidesPerView={2}
+              scrollbar={false}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                768: { slidesPerView: 3 },
+                1024: { slidesPerView: 3 },
+                1280: { slidesPerView: 5 },
               }}
-              >
+            >
               {products.map((product) => (
                 <SwiperSlide key={product._id} className="p-3">
-                <ProductCard product={product} />
+                  <ProductHighlightCard product={product} />
                 </SwiperSlide>
-                ))}
-                </Swiper>
+              ))}
+            </Swiper>
           </div>
         </div>
       </div>
