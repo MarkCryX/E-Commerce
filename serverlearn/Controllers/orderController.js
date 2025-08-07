@@ -13,10 +13,14 @@ exports.createOrder = async (req, res) => {
 
   try {
     const userId = req.user._id; //ดึงมาจาก authcheck
-    const { products, shippingAddress } = req.body;
+    const { products, shippingAddress, payment } = req.body;
 
     if (!shippingAddress || !shippingAddress.name || !shippingAddress.phone) {
       return res.status(400).json({ message: "ข้อมูลที่อยู่ไม่ถูกต้อง" });
+    }
+
+    if (!payment) {
+      return res.status(400).json({ message: "ข้อมูลการชำระเงินไม่ถูกต้อง" });
     }
 
     let calculatedTotalAmount = 0;
@@ -54,7 +58,8 @@ exports.createOrder = async (req, res) => {
       userId: userId,
       products: orderProducts,
       totalAmount: calculatedTotalAmount,
-      shippingAddress, // ✅ บันทึกข้อมูลที่อยู่ใน Order
+      shippingAddress,
+      payment,
     });
 
     const savedOrder = await newOrder.save();
@@ -67,6 +72,21 @@ exports.createOrder = async (req, res) => {
 
     res.status(201).json({ message: "สร้างคำสั่งซื้อสำเร็จ" });
   } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+  }
+};
+
+exports.readOrder = async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    if (!orders) return res.status(404).json({ message: "ไม่พบ Order" });
+
+    return res.json(orders);
+  } catch (error) {
     console.error(err);
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }

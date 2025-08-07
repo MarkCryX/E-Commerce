@@ -15,7 +15,7 @@ const orderSchema = mongoose.Schema(
           ref: "Product",
           required: true,
         },
-        image:{
+        image: {
           type: String,
         },
         name: {
@@ -47,8 +47,20 @@ const orderSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["รอดำเนินการ", "เสร็จสิ้น", "ยกเลิก"],
+      enum: [
+        "รอดำเนินการ",
+        "กำลังจัดเตรียมสินค้า",
+        "พร้อมจัดส่ง",
+        "จัดส่งแล้ว",
+        "เสร็จสิ้น",
+        "ยกเลิก",
+      ],
       default: "รอดำเนินการ",
+    },
+    payment: {
+      type: String,
+      enum: ["cod", "promptpay", "creditcard"],
+      require: true,
     },
     paymentstatus: {
       type: String,

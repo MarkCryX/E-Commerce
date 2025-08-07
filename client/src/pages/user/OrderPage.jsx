@@ -1,8 +1,26 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { fetchOrderById } from "@/api/orders";
 
 const OrderPage = () => {
   const { user, loading } = useAuth();
-  const { orders } = user;
+  const [ordersData, setOrdersData] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        const response = await fetchOrderById();
+        setOrdersData(response);
+      } catch (error) {
+        console.error("เกิดข้อผิดพลาดขณะโหลดคำสั่งซื้อ", error);
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+
+    loadOrders();
+  }, [user]);
 
   if (loading) return <p>กำลังโหลด...</p>;
 
@@ -12,10 +30,10 @@ const OrderPage = () => {
         รายการคำสั่งซื้อของคุณ
       </h1>
 
-      {orders.length === 0 ? (
+      {ordersData.length === 0 ? (
         <p className="text-gray-600">คุณยังไม่มีคำสั่งซื้อ</p>
       ) : (
-        orders.map((order) => (
+        ordersData.map((order) => (
           <div
             key={order._id}
             className="mt-3 mb-5 rounded-xl border p-4 shadow-sm transition hover:shadow-md"
