@@ -4,6 +4,8 @@ const User = require("../Models/User");
 const Product = require("../Models/Product");
 const { validationResult } = require("express-validator");
 
+// --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
+
 exports.createOrder = async (req, res) => {
   const errors = validationResult(req);
 
@@ -77,7 +79,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-exports.readOrder = async (req, res) => {
+exports.readOrders = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user._id })
       .sort({ createdAt: -1 })
@@ -85,8 +87,20 @@ exports.readOrder = async (req, res) => {
 
     if (!orders) return res.status(404).json({ message: "ไม่พบ Order" });
 
-    return res.json(orders);
+    return res.status(200).json(orders);
   } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+  }
+};
+
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
+exports.getOrdersAdmin = async (req, res) => {
+  try {
+    const orders = await Order.find({}).sort({ createdAt: -1}).limit(10);
+    
+    return res.status(200).json(orders);
+  } catch (err) {
     console.error(err);
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
