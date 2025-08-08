@@ -42,3 +42,20 @@ export const fetchOrdersAdmin = async () => {
     throw msg;
   }
 };
+
+export const updateStatusOrder = async (id, status) => {
+  try {
+    const response = await axios.patch(
+      `${API_BASE}/${id}`,
+      { status },
+      {
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    const msg =
+      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
+    throw msg;
+  }
+};
