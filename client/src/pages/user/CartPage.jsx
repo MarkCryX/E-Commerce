@@ -57,14 +57,10 @@ const CartPage = () => {
         payment: paymentMethod,
       };
 
-      if (orderData.payment === "cod") {
-        const response = await createOrder(orderData);
-        clearCart();
-        toast.success("สั่งซื้อสินค้าสำเร็จ");
-        navigate("/user/orders");
-      } else if (orderData.payment === "promptpay") {
-        navigate("/user/orders");
-      }
+      const response = await createOrder(orderData);
+      clearCart();
+      toast.success("สั่งซื้อสินค้าสำเร็จ");
+      navigate("/user/orders");
     } catch (error) {
       toast.error(error);
     }

@@ -1,11 +1,27 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { fetchOrders } from "@/api/orders";
+import { fetchOrders, genQRCodeForOrder } from "@/api/orders";
+import { RxCross1 } from "react-icons/rx";
 
 const OrderPage = () => {
   const { user, loading } = useAuth();
   const [ordersData, setOrdersData] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [modalQrcode, setModalQrcode] = useState(false);
+  const [imgQRCode, setImgQRCode] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const handleOpenModal = async (order) => {
+    setSelectedOrder(order);
+    setModalQrcode(true);
+    setImgQRCode("");
+    try {
+      const response = await genQRCodeForOrder(order._id);
+      setImgQRCode(response.qrCodeData);
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการดึง QR Code", error);
+    }
+  };
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -47,7 +63,15 @@ const OrderPage = () => {
                   สถานะ: <span className="font-semibold">{order.status}</span>
                 </p>
                 <p className="text-sm text-gray-600">
-                  ชำระเงิน:{" "}
+                  วิธีชำระเงิน:{" "}
+                  <span className="font-semibold">
+                    {order.payment === "cod"
+                      ? "ชำระเงินปลายทาง"
+                      : "พร้อมเพย์ / QR Code"}
+                  </span>
+                </p>
+                <p className="text-sm text-gray-600">
+                  สถานะชำระเงิน:{" "}
                   <span className="font-semibold">{order.paymentstatus}</span>
                 </p>
               </div>
@@ -81,15 +105,59 @@ const OrderPage = () => {
               ))}
             </div>
 
-            <div className="mt-4 text-sm text-gray-500">
-              จัดส่งไปยัง: {order.shippingAddress.name},{" "}
-              {order.shippingAddress.addressLine},{" "}
-              {order.shippingAddress.subDistrict},{" "}
-              {order.shippingAddress.district}, {order.shippingAddress.province}{" "}
-              {order.shippingAddress.postalCode}
+            <div className="flex justify-between">
+              <div className="mt-4 text-sm text-gray-500">
+                จัดส่งไปยัง: {order.shippingAddress.name},{" "}
+                {order.shippingAddress.addressLine},{" "}
+                {order.shippingAddress.subDistrict},{" "}
+                {order.shippingAddress.district},{" "}
+                {order.shippingAddress.province}{" "}
+                {order.shippingAddress.postalCode}
+              </div>
+              {order.payment === "promptpay" &&
+              order.paymentstatus === "รอชำระ" ? (
+                <button
+                  className="mt-2 cursor-pointer rounded-lg bg-blue-500 px-3 py-2 text-white"
+                  disabled={
+                    !order.payment === "promptpay" &&
+                    !order.paymentstatus === "รอชำระ"
+                  }
+                  onClick={() => handleOpenModal(order)}
+                >
+                  ชำระเงิน
+                </button>
+              ) : (
+                <div></div>
+              )}
             </div>
           </div>
         ))
+      )}
+      {modalQrcode && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-lg rounded-lg bg-white p-6">
+            <h1 className="text-center text-xl font-medium">สแกนชำระเงิน</h1>
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <p className="text-gray-600">
+                ยอดที่ต้องชำระ:{" "}
+                <span className="font-bold text-green-600">
+                  {selectedOrder.totalAmount.toLocaleString()} ฿
+                </span>
+              </p>
+              {imgQRCode ? (
+                <img
+                  src={imgQRCode}
+                  alt="PromptPay QR Code"
+                  className="h-64 w-64 rounded-xl p-4 shadow-inner"
+                />
+              ) : (
+                <div className="flex h-64 w-64 items-center justify-center text-gray-400">
+                  <p>กำลังสร้าง QR Code...</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

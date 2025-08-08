@@ -59,3 +59,16 @@ export const updateStatusOrder = async (id, status) => {
     throw msg;
   }
 };
+
+export const genQRCodeForOrder = async (id) => {
+  try {
+    const response = await axios.get(`${API_BASE}/qrcode/${id}`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    const msg =
+      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
+    throw msg;
+  }
+};

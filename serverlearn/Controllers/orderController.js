@@ -85,7 +85,10 @@ exports.readOrders = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(10);
 
-    if (!orders) return res.status(404).json({ message: "ไม่พบ Order" });
+    if (!orders)
+      return res
+        .status(404)
+        .json({ message: "ไม่พบคำสั่งซื้อหรือคุณไม่มีสิทธิ์เข้าถึง" });
 
     return res.status(200).json(orders);
   } catch (error) {
@@ -117,10 +120,37 @@ exports.updateStatusOrder = async (req, res) => {
     );
 
     if (!updated) {
-      return res.status(404).json({ message: "ไม่พบคำสั่งซื้อ" });
+      return res
+        .status(404)
+        .json({ message: "ไม่พบคำสั่งซื้อหรือคุณไม่มีสิทธิ์เข้าถึง" });
     }
 
     res.status(200).json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+  }
+};
+
+exports.genQRCodeForOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    // หาคำสั่งซื้อจาก id และ userId
+    const order = await Order.findOne({ _id: id, userId: userId });
+    if (!order) {
+      return res
+        .status(404)
+        .json({ message: "ไม่พบคำสั่งซื้อหรือคุณไม่มีสิทธิ์เข้าถึง" });
+    }
+
+    const { totalAmount } = order;
+    const recipientId = process.env.RECIPIENT_ID;
+
+    const qrCodeDataUrl = `https://promptpay.io/${recipientId}/${totalAmount}`;
+
+    res.status(200).json({ qrCodeData: qrCodeDataUrl });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });

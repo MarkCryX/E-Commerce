@@ -5,6 +5,7 @@ const {
   readOrders,
   getOrdersAdmin,
   updateStatusOrder,
+  genQRCodeForOrder,
 } = require("../Controllers/orderController");
 const router = express.Router();
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
@@ -14,7 +15,7 @@ const { orderValidationRules } = require("../validations/orderValidation");
 // --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 router.post("/orders", orderValidationRules, authCheck, createOrder);
 router.get("/orders/user-orders", authCheck, readOrders);
-
+router.get("/orders/qrcode/:id", authCheck, genQRCodeForOrder);
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 router.get("/orders", authCheck, isAdmin, getOrdersAdmin);
 router.patch("/orders/:id", authCheck, isAdmin, updateStatusOrder);

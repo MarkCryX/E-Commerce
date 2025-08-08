@@ -64,7 +64,7 @@ const orderSchema = mongoose.Schema(
     },
     paymentstatus: {
       type: String,
-      enum: ["รอชำระ", "ชำระเสร็จสิ้น"],
+      enum: ["รอชำระ", "กำลังตรวจสอบการชำระเงิน", "ชำระเสร็จสิ้น"],
       default: "รอชำระ",
     },
     isOrder: {
