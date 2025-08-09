@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { fetchOrders, genQRCodeForOrder } from "@/api/orders";
+import {
+  fetchOrders,
+  genQRCodeForOrder,
+  uploadPaymentSlip,
+} from "@/api/orders";
 import { RxCross1 } from "react-icons/rx";
 
 const OrderPage = () => {
@@ -10,6 +14,7 @@ const OrderPage = () => {
   const [modalQrcode, setModalQrcode] = useState(false);
   const [imgQRCode, setImgQRCode] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [paymentSlipBase64, setPaymentSlipBase64] = useState("");
 
   const handleOpenModal = async (order) => {
     setSelectedOrder(order);
@@ -21,6 +26,24 @@ const OrderPage = () => {
     } catch (error) {
       console.error("เกิดข้อผิดพลาดในการดึง QR Code", error);
     }
+  };
+
+  const handleSlipChange = async (event, orderId) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const slipUrl = reader.result;
+      setPaymentSlipBase64(slipUrl);
+      try {
+        const res = await uploadPaymentSlip(orderId, slipUrl);
+        console.log(res.message);
+      } catch (err) {
+        console.error("อัปโหลดสลิปล้มเหลว", err);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   useEffect(() => {
@@ -36,7 +59,7 @@ const OrderPage = () => {
     };
 
     loadOrders();
-  }, [user]);
+  }, [user, paymentSlipBase64]);
 
   if (loading) return <p>กำลังโหลด...</p>;
 
@@ -105,8 +128,8 @@ const OrderPage = () => {
               ))}
             </div>
 
-            <div className="flex justify-between">
-              <div className="mt-4 text-sm text-gray-500">
+            <div className="mt-4 flex items-center justify-between">
+              <div className="text-sm text-gray-500">
                 จัดส่งไปยัง: {order.shippingAddress.name},{" "}
                 {order.shippingAddress.addressLine},{" "}
                 {order.shippingAddress.subDistrict},{" "}
@@ -116,23 +139,43 @@ const OrderPage = () => {
               </div>
               {order.payment === "promptpay" &&
               order.paymentstatus === "รอชำระ" ? (
-                <button
-                  className="mt-2 cursor-pointer rounded-lg bg-blue-500 px-3 py-2 text-white"
-                  disabled={
-                    !order.payment === "promptpay" &&
-                    !order.paymentstatus === "รอชำระ"
-                  }
-                  onClick={() => handleOpenModal(order)}
-                >
-                  ชำระเงิน
-                </button>
-              ) : (
-                <div></div>
-              )}
+                <div className="flex gap-2">
+                  <button
+                    className="cursor-pointer rounded-lg bg-blue-500 px-3 py-2 text-white"
+                    onClick={() => handleOpenModal(order)}
+                  >
+                    ชำระเงิน
+                  </button>
+
+                  {/* ปุ่มอัปโหลดสลิป */}
+                  <label className="cursor-pointer rounded-lg bg-green-500 px-3 py-2 text-white">
+                    อัปโหลดสลิป
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleSlipChange(e, order._id)}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              ) : null}
             </div>
+
+            {/* แสดงตัวอย่างสลิปที่อัปโหลด */}
+            {order.paymentSlip && (
+              <div className="mt-3">
+                <p className="text-sm text-gray-600">สลิปที่อัปโหลด:</p>
+                <img
+                  src={order.paymentSlip}
+                  alt="Payment Slip"
+                  className="mt-1 h-40 rounded-lg border"
+                />
+              </div>
+            )}
           </div>
         ))
       )}
+
       {modalQrcode && (
         <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="relative w-full max-w-lg rounded-lg bg-white p-6">

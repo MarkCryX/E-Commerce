@@ -67,6 +67,11 @@ const orderSchema = mongoose.Schema(
       enum: ["รอชำระ", "กำลังตรวจสอบการชำระเงิน", "ชำระเสร็จสิ้น"],
       default: "รอชำระ",
     },
+    paymentSlip: {
+      type: String,
+      default: null,
+      uploadedAt: Date,
+    },
     isOrder: {
       type: Boolean,
       default: false,

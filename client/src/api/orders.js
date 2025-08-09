@@ -72,3 +72,17 @@ export const genQRCodeForOrder = async (id) => {
     throw msg;
   }
 };
+
+export const uploadPaymentSlip = async (id, slipUrl) => {
+  try {
+    const response = await axios.patch(
+      `${API_BASE}/${id}/payment-slip`,
+      { slipUrl },
+      { withCredentials: true },
+    );
+    return response.data;
+  } catch (error) {
+    const msg = error?.response?.data?.message || "ไม่สามารถอัปโหลดสลิปได้";
+    throw msg;
+  }
+};

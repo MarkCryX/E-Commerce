@@ -156,3 +156,27 @@ exports.genQRCodeForOrder = async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
+
+exports.uploadPaymentSlip = async (req, res) => {
+  try {
+    const { slipUrl } = req.body;
+    const orderId = req.params.id;
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { paymentSlip: slipUrl, paymentstatus: "กำลังตรวจสอบการชำระเงิน" },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "ไม่พบคำสั่งซื้อ" });
+    }
+
+    res.json({
+      message: "อัปโหลดสลิปสำเร็จ",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในการอัปโหลดสลิป" });
+  }
+};
