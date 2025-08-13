@@ -6,6 +6,7 @@ import {
   closeOrder,
 } from "@/api/orders";
 import { RxCross1 } from "react-icons/rx";
+import { toast } from "react-toastify";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -19,19 +20,23 @@ const ManageOrders = () => {
       setOrders((prev) =>
         prev.map((order) => (order._id === id ? response : order)),
       );
+      toast.success("อัพเดทสถานะคำสั่งซื้อสำเร็จ");
     } catch (error) {
       console.error(error);
+      toast.error(error);
     }
   };
 
-  const handleUpdatePaymentStatus = async (id, status) => {
+  const handleUpdatePaymentStatus = async (id, paymentstatus) => {
     try {
-      const response = await updatePaymemtStatus(id, status);
+      const response = await updatePaymemtStatus(id, paymentstatus);
       setOrders((prev) =>
         prev.map((order) => (order._id === id ? response : order)),
       );
+      toast.success("อัพเดทสถานะการชำระเงินสำเร็จ");
     } catch (error) {
       console.error(error);
+      toast.error(error);
     }
   };
 
@@ -48,6 +53,7 @@ const ManageOrders = () => {
           .map((order) => (order._id === id ? response : order))
           .filter((order) => !order.isCompleted),
       );
+      toast.success("ปิดคำสั่งซื้อสำเร็จ");
     } catch (error) {
       console.error(error);
     }
@@ -156,7 +162,7 @@ const ManageOrders = () => {
                         className="cursor-pointer rounded-sm bg-green-500 px-2 py-1 font-light text-white"
                         onClick={() => handleCloseOrder(order._id)}
                       >
-                        ปิดออเดอร์
+                        ปิดคำสั่งซื้อ
                       </button>
                     )}
                   </div>
