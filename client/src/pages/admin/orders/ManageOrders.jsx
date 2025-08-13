@@ -1,6 +1,10 @@
 import { fetchOrdersAdmin } from "@/api/orders";
 import { useEffect, useState } from "react";
-import { updateStatusOrder, updatePaymemtStatus } from "@/api/orders";
+import {
+  updateStatusOrder,
+  updatePaymemtStatus,
+  closeOrder,
+} from "@/api/orders";
 import { RxCross1 } from "react-icons/rx";
 
 const ManageOrders = () => {
@@ -12,7 +16,9 @@ const ManageOrders = () => {
   const handleUpdateStatus = async (id, status) => {
     try {
       const response = await updateStatusOrder(id, status);
-      console.log(response);
+      setOrders((prev) =>
+        prev.map((order) => (order._id === id ? response : order)),
+      );
     } catch (error) {
       console.error(error);
     }
@@ -21,7 +27,9 @@ const ManageOrders = () => {
   const handleUpdatePaymentStatus = async (id, status) => {
     try {
       const response = await updatePaymemtStatus(id, status);
-      console.log(response);
+      setOrders((prev) =>
+        prev.map((order) => (order._id === id ? response : order)),
+      );
     } catch (error) {
       console.error(error);
     }
@@ -30,6 +38,19 @@ const ManageOrders = () => {
   const handleOpenSlip = (slipUrl) => {
     setSlip(slipUrl);
     setModalSlip(true);
+  };
+
+  const handleCloseOrder = async (id) => {
+    try {
+      const response = await closeOrder(id);
+      setOrders((prev) =>
+        prev
+          .map((order) => (order._id === id ? response : order))
+          .filter((order) => !order.isCompleted),
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -128,14 +149,22 @@ const ManageOrders = () => {
                       <option value="พร้อมจัดส่ง">พร้อมจัดส่ง</option>
                       <option value="จัดส่งแล้ว">จัดส่งแล้ว</option>
                       <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-                      <option value="ยกเลิก">ยกเลิก</option>
                     </select>
+
+                    {order.status === "เสร็จสิ้น" && (
+                      <button
+                        className="cursor-pointer rounded-sm bg-green-500 px-2 py-1 font-light text-white"
+                        onClick={() => handleCloseOrder(order._id)}
+                      >
+                        ปิดออเดอร์
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
 
               {order.paymentstatus === "กำลังตรวจสอบการชำระเงิน" && (
-                <div className="mt-3 flex gap-3">
+                <div className="mt-3 flex justify-between gap-3">
                   <button
                     className="cursor-pointer rounded-sm bg-blue-500 px-2 py-1 font-light text-white"
                     onClick={() => handleOpenSlip(order.paymentSlip)}
@@ -163,6 +192,7 @@ const ManageOrders = () => {
           </div>
         ))
       )}
+
       {modalSlip && (
         <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <div className="relative w-full max-w-lg rounded-lg bg-white p-6">

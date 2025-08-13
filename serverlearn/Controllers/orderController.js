@@ -100,7 +100,7 @@ exports.readOrders = async (req, res) => {
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 exports.getOrdersAdmin = async (req, res) => {
   try {
-    const orders = await Order.find({}).sort({ createdAt: -1 }).limit(10);
+    const orders = await Order.find({isCompleted: false}).sort({ createdAt: -1 }).limit(10);
 
     return res.status(200).json(orders);
   } catch (err) {
@@ -187,7 +187,7 @@ exports.updatePaymemtStatus = async (req, res) => {
 
     const updated = await Order.findByIdAndUpdate(
       id,
-      { $set: { paymentstatus: req.body.status } },
+      { $set: { paymentstatus: req.body.paymentstatus } },
       { new: true, runValidators: true }
     );
 
@@ -203,4 +203,28 @@ exports.updatePaymemtStatus = async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
+
+exports.completeOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updated = await Order.findByIdAndUpdate(
+      id,
+      { $set: { isCompleted: true } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) {
+      return res
+        .status(404)
+        .json({ message: "ไม่พบคำสั่งซื้อหรือคุณไม่มีสิทธิ์เข้าถึง" });
+    }
+
+    res.status(200).json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+  }
+};
+
 

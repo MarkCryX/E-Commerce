@@ -72,7 +72,7 @@ const orderSchema = mongoose.Schema(
       default: null,
       uploadedAt: Date,
     },
-    isOrder: {
+    isCompleted: {
       type: Boolean,
       default: false,
     },

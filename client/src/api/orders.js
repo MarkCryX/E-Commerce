@@ -87,16 +87,28 @@ export const uploadPaymentSlip = async (id, slipUrl) => {
   }
 };
 
-export const updatePaymentStatus = async () => {
-  try {
-  } catch (error) {}
-};
-
 export const updatePaymemtStatus = async (id, status) => {
   try {
     const response = await axios.patch(
       `${API_BASE}/${id}/payment-status`,
-      { status },
+      { paymentstatus },
+      {
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    const msg =
+      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
+    throw msg;
+  }
+};
+
+export const closeOrder = async (id) => {
+  try {
+    const response = await axios.patch(
+      `${API_BASE}/${id}/complete`,
+      {},
       {
         withCredentials: true,
       },

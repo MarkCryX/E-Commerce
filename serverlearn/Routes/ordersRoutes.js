@@ -8,6 +8,7 @@ const {
   genQRCodeForOrder,
   uploadPaymentSlip,
   updatePaymemtStatus,
+  completeOrder,
 } = require("../Controllers/orderController");
 const router = express.Router();
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
@@ -24,5 +25,7 @@ router.patch("/orders/:id/payment-slip", authCheck, uploadPaymentSlip);
 router.get("/orders", authCheck, isAdmin, getOrdersAdmin);
 router.patch("/orders/:id/status", authCheck, isAdmin, updateStatusOrder);
 router.patch("/orders/:id/payment-status", authCheck, isAdmin, updatePaymemtStatus);
+router.patch("/orders/:id/complete", authCheck, isAdmin, completeOrder);
+
 
 module.exports = router;
