@@ -18,14 +18,47 @@ const { orderValidationRules } = require("../validations/orderValidation");
 // --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 router.post("/orders", orderValidationRules, authCheck, createOrder);
 router.get("/orders/user-orders", authCheck, readOrders);
-router.get("/orders/qrcode/:id", authCheck, genQRCodeForOrder);
-router.patch("/orders/:id/payment-slip", authCheck, uploadPaymentSlip);
+
+router.get(
+  "/orders/qrcode/:id",
+  [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
+  authCheck,
+  genQRCodeForOrder
+);
+
+router.patch(
+  "/orders/:id/payment-slip",
+  [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
+  authCheck,
+  uploadPaymentSlip
+);
+
 
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 router.get("/orders", authCheck, isAdmin, getOrdersAdmin);
-router.patch("/orders/:id/status", authCheck, isAdmin, updateStatusOrder);
-router.patch("/orders/:id/payment-status", authCheck, isAdmin, updatePaymemtStatus);
-router.patch("/orders/:id/complete", authCheck, isAdmin, completeOrder);
 
+router.patch(
+  "/orders/:id/status",
+  [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
+  authCheck,
+  isAdmin,
+  updateStatusOrder
+);
+
+router.patch(
+  "/orders/:id/payment-status",
+  [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
+  authCheck,
+  isAdmin,
+  updatePaymemtStatus
+);
+
+router.patch(
+  "/orders/:id/complete",
+  [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
+  authCheck,
+  isAdmin,
+  completeOrder
+);
 
 module.exports = router;

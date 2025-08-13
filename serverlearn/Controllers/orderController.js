@@ -100,7 +100,9 @@ exports.readOrders = async (req, res) => {
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 exports.getOrdersAdmin = async (req, res) => {
   try {
-    const orders = await Order.find({isCompleted: false}).sort({ createdAt: -1 }).limit(10);
+    const orders = await Order.find({ isCompleted: false })
+      .sort({ createdAt: -1 })
+      .limit(10);
 
     return res.status(200).json(orders);
   } catch (err) {
@@ -110,6 +112,11 @@ exports.getOrdersAdmin = async (req, res) => {
 };
 
 exports.updateStatusOrder = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { id } = req.params;
 
@@ -133,6 +140,11 @@ exports.updateStatusOrder = async (req, res) => {
 };
 
 exports.genQRCodeForOrder = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { id } = req.params;
     const userId = req.user._id;
@@ -158,6 +170,11 @@ exports.genQRCodeForOrder = async (req, res) => {
 };
 
 exports.uploadPaymentSlip = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { slipUrl } = req.body;
     const orderId = req.params.id;
@@ -182,6 +199,11 @@ exports.uploadPaymentSlip = async (req, res) => {
 };
 
 exports.updatePaymemtStatus = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { id } = req.params;
 
@@ -205,6 +227,11 @@ exports.updatePaymemtStatus = async (req, res) => {
 };
 
 exports.completeOrder = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { id } = req.params;
 
@@ -226,5 +253,3 @@ exports.completeOrder = async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
-
-
