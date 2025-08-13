@@ -55,7 +55,7 @@ export const updateStatusOrder = async (id, status) => {
     return response.data;
   } catch (error) {
     const msg =
-      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
+      error?.response?.data?.message || "ไม่สามารถอัพเดทสถานะสั่งซื้อได้";
     throw msg;
   }
 };
@@ -68,7 +68,7 @@ export const genQRCodeForOrder = async (id) => {
     return response.data;
   } catch (error) {
     const msg =
-      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
+      error?.response?.data?.message || "ไม่สามารถสร้าง QR-Code ชำระคำสั่งซื้อได้";
     throw msg;
   }
 };
@@ -99,7 +99,7 @@ export const updatePaymemtStatus = async (id, status) => {
     return response.data;
   } catch (error) {
     const msg =
-      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
+      error?.response?.data?.message || "ไม่สามารถอัพเดทสถานะการชำระเงินได้";
     throw msg;
   }
 };
@@ -116,7 +116,7 @@ export const closeOrder = async (id) => {
     return response.data;
   } catch (error) {
     const msg =
-      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
+      error?.response?.data?.message || "ไม่สามารถปิดคำสั่งซื้อได้";
     throw msg;
   }
 };
