@@ -181,6 +181,12 @@ const OrderPage = () => {
           <div className="relative w-full max-w-lg rounded-lg bg-white p-6">
             <h1 className="text-center text-xl font-medium">สแกนชำระเงิน</h1>
             <div className="flex flex-col items-center justify-center space-y-4">
+              <button
+                onClick={() => setModalQrcode(false)}
+                className="absolute top-3 right-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-300"
+              >
+                <RxCross1 className="h-5 w-5" />
+              </button>
               <p className="text-gray-600">
                 ยอดที่ต้องชำระ:{" "}
                 <span className="font-bold text-green-600">
