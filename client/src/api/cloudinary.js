@@ -3,8 +3,7 @@ import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_BACK_END_URL;
 
-export const uploadImageToCloudinary = async (file, onProgress) => {
-  // สร้าง FormData object เพื่อส่งไฟล์
+export const uploadImageToCloudinary = async (file) => {
   const formData = new FormData();
   formData.append("images", file);
 
@@ -17,17 +16,6 @@ export const uploadImageToCloudinary = async (file, onProgress) => {
           "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
-        onUploadProgress: (progressEvent) => {
-          // เพิ่ม onUploadProgress
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total,
-          );
-          // ตรวจสอบว่า onProgress ถูกส่งมาและเป็นฟังก์ชันก่อนเรียกใช้
-          if (onProgress && typeof onProgress === "function") {
-            // <--- ตรวจสอบให้ละเอียดขึ้น
-            onProgress(percentCompleted);
-          }
-        },
       },
     );
     return response.data.images[0];

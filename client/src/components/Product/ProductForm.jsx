@@ -9,13 +9,14 @@ import { extractErrorMessage } from "@/utils/errorHelper";
 import imageCompression from "browser-image-compression";
 import { useNavigate } from "react-router-dom";
 import { fetchCategory } from "@/api/category";
+import { RxCross1 } from "react-icons/rx";
 
 const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({}); // เก็บ progress ของแต่ละไฟล์ เช่น { "file1.jpg": 50, "file2.png": 80 }
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -25,8 +26,8 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
     description: "",
     sizes: [],
     colors: [],
-    sizesString: "", // เพิ่ม field ใหม่
-    colorsString: "", // เพิ่ม field ใหม่
+    sizesString: "",
+    colorsString: "",
     category: "",
     images: [],
   });
@@ -50,16 +51,30 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
     }));
   };
 
-  const handleImageChange = async (e) => {
+  const handleUploadImage = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
 
+    const invalidFiles = files.filter(
+      (file) => !file.type.startsWith("image/"),
+    );
+
+    if (invalidFiles.length > 0) {
+      setError(
+        `ไฟล์เหล่านี้ไม่ใช่รูปภาพ: ${invalidFiles.map((file) => file.name).join(", ")}`,
+      );
+      toast.error("ไฟล์นี้ไม่ใช่รูปภาพ");
+      return;
+    }
+
     setImageUploadLoading(true);
     setError(null);
+    setUploading(true);
 
     try {
       const uploadedImages = [];
       for (const file of files) {
+        // กำหนดคุณภาพบีบอัดรูปภาพ
         const options = {
           maxSizeMB: 1,
           maxWidthOrHeight: 1920,
@@ -68,50 +83,36 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
 
         let processedFile = file;
         try {
+          //ส่งไฟล์รูป และ optionsเข้าไปบีบอัดไฟล์
           const compressedFile = await imageCompression(file, options);
           processedFile = compressedFile;
-        } catch (compressionError) {
-          // เปลี่ยนชื่อ error เป็น compressionError เพื่อให้ชัดเจน
-          console.error("Error during image compression:", compressionError);
-          // processedFile ยังคงเป็น 'file' (ไฟล์ต้นฉบับ) อยู่แล้ว
+        } catch (error) {
+          console.error("เกิดข้อผิดพลาดไม่สามารถบีบอัดไฟล์รูปได้:", error);
           toast.warn(
             `ไม่สามารถบีบอัดรูปภาพ ${file.name} ได้ จะอัปโหลดไฟล์ต้นฉบับแทน`,
           );
         }
-
-        // ส่งไฟล์ที่บีบอัดแล้ว (หรือต้นฉบับ) ไป Backend
-        const result = await uploadImageToCloudinary(
-          processedFile,
-          (percent) => {
-            // อัปเดต progress ของไฟล์นั้นๆ
-            setUploadProgress((prev) => ({ ...prev, [file.name]: percent }));
-          },
-        );
+        // อัพโหลดไฟล์
+        const result = await uploadImageToCloudinary(processedFile);
         uploadedImages.push(result);
-        setUploadProgress((prev) => {
-          // ลบ progress ของไฟล์ที่เสร็จแล้วออกเมื่ออัปโหลดสมบูรณ์
-          const newState = { ...prev };
-          delete newState[file.name];
-          return newState;
-        });
       }
 
+      // เพิ่มรูปภาพที่อัพโหลดเสร็จแล้วเข้า stateForm
       setForm((prev) => ({
         ...prev,
         images: [...prev.images, ...uploadedImages],
       }));
-      e.target.value = null; // เคลียร์ input field เพื่อให้สามารถเลือกไฟล์เดิมซ้ำได้
+
+      e.target.value = null; // เคลียร์ input
       toast.success("อัปโหลดรูปภาพสำเร็จ!");
     } catch (err) {
       console.error("Error uploading images:", err);
       const message = extractErrorMessage(err);
-      setError("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ: " + message);
-      toast.error("อัปโหลดรูปภาพไม่สำเร็จ: " + message);
-      // ในกรณีที่เกิด error ใหญ่ (เช่น เน็ตหลุดระหว่างอัปโหลดหลายรูป)
-      // อาจจะต้องล้าง uploadProgress ทั้งหมดด้วย
-      setUploadProgress({});
+      setError(message);
+      toast.error("อัปโหลดรูปภาพไม่สำเร็จ");
     } finally {
       setImageUploadLoading(false);
+      setUploading(false);
     }
   };
 
@@ -226,8 +227,6 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
     fetchCategories();
   }, []);
 
-  // นับจำนวนไฟล์ที่กำลังอัปโหลด
-  const uploadingFileCount = Object.keys(uploadProgress).length;
   // นับจำนวนไฟล์ที่อัปโหลดเสร็จแล้ว
   const uploadedFileCount = form.images.length;
 
@@ -335,31 +334,16 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
                   type="file"
                   multiple
                   className="w-full cursor-pointer rounded border border-gray-300 px-3 py-2 text-sm shadow-sm file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
-                  onChange={handleImageChange}
+                  onChange={handleUploadImage}
                   disabled={imageUploadLoading}
                 />
 
                 {/* แสดงสถานะการอัปโหลด */}
-                {imageUploadLoading && (
+                {uploading && (
                   <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
                     <p className="mb-2 text-sm font-medium text-blue-700">
-                      กำลังอัปโหลดรูปภาพ {uploadingFileCount} ไฟล์...
+                      กำลังอัปโหลดรูปภาพ...
                     </p>
-                    {Object.entries(uploadProgress).map(
-                      ([fileName, percent]) => (
-                        <div key={fileName} className="mb-3">
-                          <p className="mb-1 text-xs text-gray-700">
-                            {fileName}: {percent}%
-                          </p>
-                          <div className="h-2 w-full rounded bg-gray-200">
-                            <div
-                              className="h-2 rounded bg-blue-500 transition-all duration-300"
-                              style={{ width: `${percent}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      ),
-                    )}
                   </div>
                 )}
               </div>
@@ -463,20 +447,7 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
                       className="absolute top-1 right-1 rounded-full bg-red-500 p-1 text-xs text-white hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:outline-none"
                       title="ลบรูปภาพ"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
+                      <RxCross1 />
                     </button>
                   </div>
                 ))

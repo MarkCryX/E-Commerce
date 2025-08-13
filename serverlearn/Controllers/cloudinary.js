@@ -27,19 +27,19 @@ exports.createImages = async (req, res, next) => {
     for (const file of files) {
       // อัปโหลดไฟล์จาก buffer (ที่ Multer จัดการให้) ขึ้น Cloudinary
       const result = await cloudinary.uploader.upload(file.path, {
-        // ใช้ file.path หรือ file.buffer
         public_id: `product_${Date.now()}_${Math.random()
           .toString(36)
           .substring(2, 8)}`,
         resource_type: "auto",
-        folder: "Product",
+        folder: "Ecom2024/Product",
       });
+      
       uploadedImages.push({
         public_id: result.public_id,
         url: result.secure_url,
       });
 
-      // (ทางเลือก) ลบไฟล์ชั่วคราวออกจากเซิร์ฟเวอร์หลังจากอัปโหลดขึ้น Cloudinary แล้ว
+      //ลบไฟล์รูปที่เก็บสำรองไว้ในไฟล์ /uploads ตามที่ใส่ไว้ในไฟล์ upload.js
       fs.unlinkSync(file.path);
     }
 
@@ -68,7 +68,6 @@ exports.removeImage = async (req, res, next) => {
     if (result.result === "ok") {
       res.status(200).json({ message: "ลบรูปภาพสำเร็จ", public_id });
     } else {
-      // กรณี Cloudinary รายงานว่าไม่สำเร็จ (เช่น public_id ไม่ถูกต้อง)
       res.status(404).json({
         message:
           "ไม่สามารถลบรูปภาพได้: " +
