@@ -180,3 +180,27 @@ exports.uploadPaymentSlip = async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในการอัปโหลดสลิป" });
   }
 };
+
+exports.updatePaymemtStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updated = await Order.findByIdAndUpdate(
+      id,
+      { $set: { paymentstatus: req.body.status } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) {
+      return res
+        .status(404)
+        .json({ message: "ไม่พบคำสั่งซื้อหรือคุณไม่มีสิทธิ์เข้าถึง" });
+    }
+
+    res.status(200).json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
+  }
+};
+

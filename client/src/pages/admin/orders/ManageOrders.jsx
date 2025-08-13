@@ -1,10 +1,13 @@
 import { fetchOrdersAdmin } from "@/api/orders";
 import { useEffect, useState } from "react";
-import { updateStatusOrder } from "@/api/orders";
+import { updateStatusOrder, updatePaymemtStatus } from "@/api/orders";
+import { RxCross1 } from "react-icons/rx";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalSlip, setModalSlip] = useState(false);
+  const [slip, setSlip] = useState("");
 
   const handleUpdateStatus = async (id, status) => {
     try {
@@ -13,6 +16,20 @@ const ManageOrders = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleUpdatePaymentStatus = async (id, status) => {
+    try {
+      const response = await updatePaymemtStatus(id, status);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleOpenSlip = (slipUrl) => {
+    setSlip(slipUrl);
+    setModalSlip(true);
   };
 
   useEffect(() => {
@@ -94,28 +111,74 @@ const ManageOrders = () => {
                   {order.shippingAddress.province}{" "}
                   {order.shippingAddress.postalCode}
                 </div>
-                <div>
-                  <select
-                    value={order.status}
-                    onChange={(e) =>
-                      handleUpdateStatus(order._id, e.target.value)
-                    }
-                    className="rounded border px-2 py-1"
-                  >
-                    <option value="รอดำเนินการ">รอดำเนินการ</option>
-                    <option value="กำลังจัดเตรียมสินค้า">
-                      กำลังจัดเตรียมสินค้า
-                    </option>
-                    <option value="พร้อมจัดส่ง">พร้อมจัดส่ง</option>
-                    <option value="จัดส่งแล้ว">จัดส่งแล้ว</option>
-                    <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-                    <option value="ยกเลิก">ยกเลิก</option>
-                  </select>
-                </div>
+                {order.paymentstatus === "ชำระเสร็จสิ้น" && (
+                  <div className="flex items-center gap-2">
+                    <p>อัพเดทสถานะออเดอร์: </p>
+                    <select
+                      value={order.status}
+                      onChange={(e) =>
+                        handleUpdateStatus(order._id, e.target.value)
+                      }
+                      className="rounded border px-2 py-1"
+                    >
+                      <option value="รอดำเนินการ">รอดำเนินการ</option>
+                      <option value="กำลังจัดเตรียมสินค้า">
+                        กำลังจัดเตรียมสินค้า
+                      </option>
+                      <option value="พร้อมจัดส่ง">พร้อมจัดส่ง</option>
+                      <option value="จัดส่งแล้ว">จัดส่งแล้ว</option>
+                      <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+                      <option value="ยกเลิก">ยกเลิก</option>
+                    </select>
+                  </div>
+                )}
               </div>
+
+              {order.paymentstatus === "กำลังตรวจสอบการชำระเงิน" && (
+                <div className="mt-3 flex gap-3">
+                  <button
+                    className="cursor-pointer rounded-sm bg-blue-500 px-2 py-1 font-light text-white"
+                    onClick={() => handleOpenSlip(order.paymentSlip)}
+                  >
+                    ดูสลิป
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <p>อัพเดทสถานะชำระเงิน: </p>
+                    <select
+                      value={order.paymentstatus}
+                      onChange={(e) =>
+                        handleUpdatePaymentStatus(order._id, e.target.value)
+                      }
+                      className="rounded border px-2 py-1"
+                    >
+                      <option value="กำลังตรวจสอบการชำระเงิน">
+                        กำลังตรวจสอบการชำระเงิน
+                      </option>
+                      <option value="ชำระเสร็จสิ้น">ชำระเสร็จสิ้น</option>
+                    </select>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))
+      )}
+      {modalSlip && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <div className="relative w-full max-w-lg rounded-lg bg-white p-6">
+            <button
+              onClick={() => setModalSlip(false)}
+              className="absolute top-3 right-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-300"
+            >
+              <RxCross1 className="h-5 w-5" />
+            </button>
+            {slip ? (
+              <img src={slip} alt="" height={500} width={500} />
+            ) : (
+              <p>ยังไม่มีสลิป</p>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -7,6 +7,7 @@ const {
   updateStatusOrder,
   genQRCodeForOrder,
   uploadPaymentSlip,
+  updatePaymemtStatus,
 } = require("../Controllers/orderController");
 const router = express.Router();
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
@@ -21,5 +22,7 @@ router.patch("/orders/:id/payment-slip", authCheck, uploadPaymentSlip);
 
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 router.get("/orders", authCheck, isAdmin, getOrdersAdmin);
-router.patch("/orders/:id", authCheck, isAdmin, updateStatusOrder);
+router.patch("/orders/:id/status", authCheck, isAdmin, updateStatusOrder);
+router.patch("/orders/:id/payment-status", authCheck, isAdmin, updatePaymemtStatus);
+
 module.exports = router;

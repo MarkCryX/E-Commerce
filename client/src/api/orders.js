@@ -46,7 +46,7 @@ export const fetchOrdersAdmin = async () => {
 export const updateStatusOrder = async (id, status) => {
   try {
     const response = await axios.patch(
-      `${API_BASE}/${id}`,
+      `${API_BASE}/${id}/status`,
       { status },
       {
         withCredentials: true,
@@ -83,6 +83,28 @@ export const uploadPaymentSlip = async (id, slipUrl) => {
     return response.data;
   } catch (error) {
     const msg = error?.response?.data?.message || "ไม่สามารถอัปโหลดสลิปได้";
+    throw msg;
+  }
+};
+
+export const updatePaymentStatus = async () => {
+  try {
+  } catch (error) {}
+};
+
+export const updatePaymemtStatus = async (id, status) => {
+  try {
+    const response = await axios.patch(
+      `${API_BASE}/${id}/payment-status`,
+      { status },
+      {
+        withCredentials: true,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    const msg =
+      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
     throw msg;
   }
 };
