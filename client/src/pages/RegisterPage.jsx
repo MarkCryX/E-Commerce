@@ -44,11 +44,11 @@ const RegisterPage = () => {
       setConfirmPassword("");
       toast.success("สมัครสมาชิกสำเร็จ");
       navigate("/login");
-    } catch (err) {
-      console.error("เกิดข้อผิดพลาดระหว่างการสมัครสมาชิก", err);
-      setError(err.response?.data?.errors);
-      const msg = extractErrorMessage(err.response?.data);
-      toast.error(msg);
+    } catch (error) {
+      const message = extractErrorMessage(error);
+      console.error("เกิดข้อผิดพลาดระหว่างการสมัครสมาชิก", error);
+      setError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +61,7 @@ const RegisterPage = () => {
   }, [isAuthenticated, loading, navigate]);
 
   return (
-    <div className="flex justify-center mt-20">
+    <div className="mt-20 flex justify-center">
       <form
         onSubmit={handleSubmit}
         className="mb-4 rounded-2xl bg-white p-10 py-20 shadow-md"

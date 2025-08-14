@@ -7,6 +7,7 @@ import { createOrder } from "@/api/orders";
 import { toast } from "react-toastify";
 import AddressModal from "@/components/UserAccount/Adress/AddressModal";
 import { useNavigate } from "react-router-dom";
+import { extractErrorMessage } from "@/utils/errorHelper";
 const CartPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -19,6 +20,7 @@ const CartPage = () => {
     handleDecrease,
   } = useCart();
   const [addressModal, setAddressModal] = useState(false);
+  const [error, setError] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const address = user.addresses;
   const currentAddress =
@@ -62,7 +64,9 @@ const CartPage = () => {
       toast.success("สั่งซื้อสินค้าสำเร็จ");
       navigate("/user/orders");
     } catch (error) {
-      toast.error(error);
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 

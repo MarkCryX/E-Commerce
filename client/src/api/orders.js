@@ -10,8 +10,13 @@ export const createOrder = async (orderData) => {
     });
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดสร้างคำสั่งซื้อ", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg = error?.response?.data?.message || "ไม่สามารถสร้างคำสั่งซื้อได้";
-    throw msg;
+    throw new Error(msg);
   }
 };
 
@@ -22,9 +27,14 @@ export const fetchOrders = async () => {
     });
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลคำสั่งซื้อ", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg =
       error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
-    throw msg;
+    throw new Error(msg);
   }
 };
 
@@ -37,9 +47,14 @@ export const fetchOrdersAdmin = async () => {
 
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลคำสั่งซื้อ", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg =
       error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
-    throw msg;
+    throw new Error(msg);
   }
 };
 
@@ -54,9 +69,14 @@ export const updateStatusOrder = async (id, status) => {
     );
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการอัพเดทสถานะคำสั่งซื้อ", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg =
       error?.response?.data?.message || "ไม่สามารถอัพเดทสถานะคำสั่งซื้อได้";
-    throw msg;
+    throw new Error(msg);
   }
 };
 
@@ -67,10 +87,15 @@ export const genQRCodeForOrder = async (id) => {
     });
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการสร้าง QR-Code ชำระคำสั่งซื้อ", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg =
       error?.response?.data?.message ||
       "ไม่สามารถสร้าง QR-Code ชำระคำสั่งซื้อได้";
-    throw msg;
+    throw new Error(msg);
   }
 };
 
@@ -83,8 +108,13 @@ export const uploadPaymentSlip = async (id, slipUrl) => {
     );
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการอัปโหลดสลิป", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg = error?.response?.data?.message || "ไม่สามารถอัปโหลดสลิปได้";
-    throw msg;
+    throw new Error(msg);
   }
 };
 
@@ -99,9 +129,14 @@ export const updatePaymemtStatus = async (id, paymentstatus) => {
     );
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการอัพเดทสถานะการชำระเงิน", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg =
       error?.response?.data?.message || "ไม่สามารถอัพเดทสถานะการชำระเงินได้";
-    throw msg;
+    throw new Error(msg);
   }
 };
 
@@ -116,7 +151,11 @@ export const closeOrder = async (id) => {
     );
     return response.data;
   } catch (error) {
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg = error?.response?.data?.message || "ไม่สามารถปิดคำสั่งซื้อได้";
-    throw msg;
+    throw new Error(msg);
   }
 };

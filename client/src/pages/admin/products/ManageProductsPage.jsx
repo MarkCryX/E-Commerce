@@ -12,12 +12,12 @@ const ManageProductsPage = () => {
 
   const loadProducts = async () => {
     try {
-      const data = await fetchProductsAdmin();
-      setProducts(data);
-    } catch (err) {
-      const msg = extractErrorMessage(error);
-      setError(msg);
-      toast.error(msg);
+      const response = await fetchProductsAdmin();
+      setProducts(response);
+    } catch (error) {
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -34,11 +34,13 @@ const ManageProductsPage = () => {
     if (!confirmDelete) return;
 
     try {
-      await deleteProduct(productId);
-      toast.success("ลบสินค้าสำเร็จ");
+      const response = await deleteProduct(productId);
+      toast.success(response);
       loadProducts();
-    } catch (err) {
-      toast.error("ลบสินค้าไม่สำเร็จ");
+    } catch (error) {
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 

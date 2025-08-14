@@ -20,13 +20,14 @@ export const uploadImageToCloudinary = async (file) => {
     );
     return response.data.images[0];
   } catch (error) {
-    console.error(
-      "Error uploading image via backend:",
-      error.response?.data || error.message,
-    );
-    throw new Error(
-      error.response?.data?.message || "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ",
-    );
+    console.error("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg =
+      error?.response?.data?.message || "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ";
+    throw new Error(msg);
   }
 };
 
@@ -41,12 +42,12 @@ export const deleteImageFromCloudinary = async (publicId) => {
     );
     return response.data; // Backend จะคืนค่า { message, public_id }
   } catch (error) {
-    console.error(
-      "Error deleting image via backend:",
-      error.response?.data || error.message,
-    );
-    throw new Error(
-      error.response?.data?.message || "เกิดข้อผิดพลาดในการลบรูปภาพ",
-    );
+    console.error("เกิดข้อผิดพลาดในการลบรูปภาพ", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg = error?.response?.data?.message || "เกิดข้อผิดพลาดในการลบรูปภาพ";
+    throw new Error(msg);
   }
 };

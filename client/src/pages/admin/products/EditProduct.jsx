@@ -15,13 +15,12 @@ const EditProduct = () => {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const data = await fetchProductByIdAdmin(id);
-        setProductData(data);
-      } catch (err) {
-        const msg = extractErrorMessage(err);
-        console.error("Error fetching product for edit:", err);
-        setError(msg);
-        toast.error(msg);
+        const response = await fetchProductByIdAdmin(id);
+        setProductData(response);
+      } catch (error) {
+        const message = extractErrorMessage(error);
+        setError(message);
+        toast.error(message);
       } finally {
         setLoading(false);
       }

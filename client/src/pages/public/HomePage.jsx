@@ -7,16 +7,21 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/scrollbar";
 import ProductHighlightCard from "@/components/Product/ProductHighlightCard";
+import { toast } from "react-toastify";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 function HomePage() {
   const [products, setProducts] = useState([]);
-
+  const [error, setError] = useState(null)
+  
   const fetchproduct = async () => {
     try {
       const response = await fetchNewArrivals();
       setProducts(response);
     } catch (error) {
-      console.error(error);
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 

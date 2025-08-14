@@ -29,12 +29,12 @@ const ProductIdPage = () => {
   useEffect(() => {
     const loadProduct = async () => {
       try {
-        const data = await fetchProductById(id);
-        setProduct(data);
+        const response = await fetchProductById(id);
+        setProduct(response);
       } catch (error) {
-        const msg = extractErrorMessage(error);
-        setError(msg);
-        toast.error(msg);
+        const message = extractErrorMessage(error);
+        setError(message);
+        toast.error(message);
         navigate("/not-found");
       } finally {
         setLoading(false);

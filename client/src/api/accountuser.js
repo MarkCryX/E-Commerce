@@ -10,12 +10,12 @@ export const createAddress = async (formData) => {
 
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดไม่สามารถเพิ่มที่อยู่ได้", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
     const msg = error?.response?.data?.message || "ไม่สามารถเพิ่มที่อยู่ได้";
-
     throw new Error(msg);
   }
 };
@@ -28,12 +28,12 @@ export const updateAdress = async (formData, addressId) => {
 
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดไม่สามารถอัพเดทที่อยู่ได้", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
     const msg = error?.response?.data?.message || "ไม่สามารถอัพเดทที่อยู่ได้";
-
     throw new Error(msg);
   }
 };
@@ -50,13 +50,12 @@ export const updateIsDefaultAddress = async (addressId) => {
 
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดไม่สามารถอัพเดทที่อยู่เป็นค่าเริ่มต้นได้", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
-
-    const msg = error?.response?.data?.message || "ไม่สามารถอัพเดทที่อยู่ได้";
-
+    const msg = error?.response?.data?.message || "ไม่สามารถอัพเดทที่อยู่เป็นค่าเริ่มต้นได้";
     throw new Error(msg);
   }
 };
@@ -69,9 +68,10 @@ export const deleteAddress = async (addressId) => {
 
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดไม่สามารถลบที่อยู่ได้", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
     const msg = error?.response?.data?.message || "ไม่สามารถลบที่อยู่ได้";
 

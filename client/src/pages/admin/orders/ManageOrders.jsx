@@ -7,11 +7,13 @@ import {
 } from "@/api/orders";
 import { RxCross1 } from "react-icons/rx";
 import { toast } from "react-toastify";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalSlip, setModalSlip] = useState(false);
+  const [error, setError] = useState(null);
   const [slip, setSlip] = useState("");
 
   const handleUpdateStatus = async (id, status) => {
@@ -22,8 +24,9 @@ const ManageOrders = () => {
       );
       toast.success("อัพเดทสถานะคำสั่งซื้อสำเร็จ");
     } catch (error) {
-      console.error(error);
-      toast.error(error);
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -35,8 +38,9 @@ const ManageOrders = () => {
       );
       toast.success("อัพเดทสถานะการชำระเงินสำเร็จ");
     } catch (error) {
-      console.error(error);
-      toast.error(error);
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -55,7 +59,9 @@ const ManageOrders = () => {
       );
       toast.success("ปิดคำสั่งซื้อสำเร็จ");
     } catch (error) {
-      console.error(error);
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -65,7 +71,9 @@ const ManageOrders = () => {
         const response = await fetchOrdersAdmin();
         setOrders(response);
       } catch (error) {
-        console.error(error);
+        const message = extractErrorMessage(error);
+        setError(message);
+        toast.error(message);
       } finally {
         setLoading(false);
       }

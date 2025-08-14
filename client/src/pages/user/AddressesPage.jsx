@@ -8,9 +8,11 @@ import {
 } from "@/api/accountuser";
 import { useState } from "react";
 import AddressCard from "@/components/UserAccount/Adress/AddressCard";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 const AddressesPage = () => {
   const { user, loading, setUser } = useAuth();
+  const [error, setError] = useState(null);
   const [modal, setModal] = useState(false);
   const [editData, setEditData] = useState(null);
   const [mode, setMode] = useState("create");
@@ -27,7 +29,9 @@ const AddressesPage = () => {
 
       toast.success(message);
     } catch (error) {
-      toast.error(error.message || "เกิดข้อผิดพลาด");
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -53,11 +57,9 @@ const AddressesPage = () => {
         }));
       }
     } catch (error) {
-      if (Array.isArray(error?.errors)) {
-        error.errors.forEach((e) => toast.error(e.msg));
-      } else {
-        toast.error(error.message || "เกิดข้อผิดพลาด");
-      }
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -72,11 +74,9 @@ const AddressesPage = () => {
       }));
       toast.success(message);
     } catch (error) {
-      if (Array.isArray(error?.errors)) {
-        error.errors.forEach((e) => toast.error(e.msg));
-      } else {
-        toast.error(error.message || "เกิดข้อผิดพลาด");
-      }
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 

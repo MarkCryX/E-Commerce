@@ -2,6 +2,7 @@ import { deleteCategory } from "@/api/category";
 import { toast } from "react-toastify";
 import CategoryForm from "./CategoryForm";
 import { useState } from "react";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 const CategoryCard = ({ categories, onDeleteSuccess }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -17,7 +18,8 @@ const CategoryCard = ({ categories, onDeleteSuccess }) => {
       onDeleteSuccess();
       toast.success(response);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "ไม่สามารถลบหมวดหมู่ได้");
+      const message = extractErrorMessage(error);
+      toast.error(message);
     }
   };
 

@@ -6,9 +6,12 @@ import { FaFilter } from "react-icons/fa";
 import ModalFilter from "@/components/Product/ModalFilter";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import SidebarFilter from "@/components/Product/SidebarFilter";
+import { toast } from "react-toastify";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 const ProductPage = () => {
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -53,10 +56,13 @@ const ProductPage = () => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const res = await fetchCategory(); // เรียกใช้ API ดึงหมวดหมู่ทั้งหมด
-        setCategories(res);
+        const response = await fetchCategory(); // เรียกใช้ API ดึงหมวดหมู่ทั้งหมด
+        setCategories(response);
       } catch (error) {
-        console.error("Error loading categories:", error);
+        const message = extractErrorMessage(error);
+        console.error("ไม่สามารถดึงข้อมูลหมวดหมู่ได้", error);
+        setError(message);
+        toast.error(message);
       }
     };
     loadCategories();
@@ -67,19 +73,29 @@ const ProductPage = () => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const res = await fetchProducts(page, 20, sortBy, selectedCategory);
-        if (res.products.length === 0 || res.page >= res.totalPages) {
+        const response = await fetchProducts(
+          page,
+          20,
+          sortBy,
+          selectedCategory,
+        );
+        if (
+          response.products.length === 0 ||
+          response.page >= response.totalPages
+        ) {
           setHasMore(false);
         }
         setProducts((prev) => {
           // กรองสินค้าที่ซ้ำกันก่อนเพิ่ม (ป้องกันกรณี IntersectionObserver ทำงานซ้ำ)
-          const newProducts = res.products.filter(
+          const newProducts = response.products.filter(
             (p) => !prev.some((old) => old._id === p._id),
           );
           return [...prev, ...newProducts];
         });
       } catch (error) {
-        console.error("Error loading products:", error);
+        const message = extractErrorMessage(error);
+        setError(message);
+        toast.error(message);
       } finally {
         setLoading(false);
       }

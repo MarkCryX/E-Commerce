@@ -22,8 +22,13 @@ export const fetchProducts = async (page = 1, limit = 20, sortBy = "createdAt_de
     );
     return response.data || [];
   } catch (error) {
-    console.error("Error fetching products:", error);
-    throw error;
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg = error?.response?.data?.message || "ไม่สามารถดึงข้อมูลสินค้าได้";
+    throw new Error(msg);
   }
 };
 
@@ -34,11 +39,12 @@ export const fetchProductById = async (id) => {
     });
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลสินค้าตาม ID", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
-    const msg = error?.response?.data?.message || "ไม่สามารถสร้างหมวดหมู่ได้";
+    const msg = error?.response?.data?.message || "ไม่สามารถดึงข้อมูลสินค้าตาม ID ได้";
     throw new Error(msg);
   }
 };
@@ -49,8 +55,13 @@ export const fetchNewArrivals = async () => {
     const response = await axios.get(`${API_BASE}/highlight/new-arrivals`);
     return response.data || []
   } catch (error) {
-    console.error("Error fetching products:", error);
-    throw error;
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลสินค้ามาใหม่", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors }; 
+    }
+    const msg = error?.response?.data?.message || "ไม่สามารถดึงข้อมูลสินค้ามาใหม่ได้";
+    throw new Error(msg);
   }
 }
 
@@ -64,8 +75,13 @@ export const fetchProductsAdmin = async () => {
     });
     return response.data || [];
   } catch (error) {
-    console.error("Error fetching products:", error);
-    throw error;
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลสินค้า", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg = error?.response?.data?.message || "ไม่สามารถดึงข้อมูลสินค้าได้";
+    throw new Error(msg);
   }
 };
 
@@ -76,11 +92,12 @@ export const fetchProductByIdAdmin = async (id) => {
     });
     return response.data;
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลตาม ID", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
-    const msg = error?.response?.data?.message || "ไม่สามารถสร้างหมวดหมู่ได้";
+    const msg = error?.response?.data?.message || "ไม่สามารถดึงข้อมูลสินค้าตาม ID ได้";
     throw new Error(msg);
   }
 };
@@ -93,11 +110,12 @@ export const createProduct = async (formproduct) => {
 
     return response.data.message || "เพิ่มสินค้าสำเร็จ";
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการสร้างสินค้า", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
-    const msg = error?.response?.data?.message || "ไม่สามารถสร้างสินค้า";
+    const msg = error?.response?.data?.message || "ไม่สามารถสร้างสินค้าได้";
     throw new Error(msg);
   }
 };
@@ -110,9 +128,10 @@ export const updateProductById = async (id, productData) => {
 
     return response.data.message || "อัพเดทสินค้าสำเร็จ";
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการอัพเดทสินค้า", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
     const msg = error?.response?.data?.message || "ไม่สามารถอัพเดทสินค้าได้";
     throw new Error(msg);
@@ -126,7 +145,12 @@ export const deleteProduct = async (id) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error deleting product:", error);
-    throw error;
+    console.error("เกิดข้อผิดพลาดในการลบสินค้าตาม ID", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg = error?.response?.data?.message || "ไม่สามารถลบสินค้าตาม ID ได้";
+    throw new Error(msg);
   }
 };

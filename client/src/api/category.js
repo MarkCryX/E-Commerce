@@ -7,8 +7,15 @@ export const fetchCategory = async () => {
     const response = await axios.get(API_BASE);
     return response.data.categories || [];
   } catch (error) {
-    console.error("Error ไม่สามามารถดึงข้อมูลหมวดหมู่มาได้:", error);
-    throw new Error("ไม่สามารถดึงข้อมูลหมวดหมู่ได้");
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลหมวดหมู่", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg =
+      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลหมวดหมู่ได้";
+
+    throw new Error(msg);
   }
 };
 
@@ -17,8 +24,15 @@ export const fetchCategoryById = async (id) => {
     const response = await axios.get(`${API_BASE}/${id}`);
     return response.data.categories || [];
   } catch (error) {
-    console.error("Error ไม่สามามารถดึงข้อมูลหมวดหมู่ตาม ID ได้:", error);
-    throw new Error("ไม่สามารถดึงข้อมูลหมวดหมู่ตาม ID ได้");
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลหมวดหมู่ตาม ID", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg =
+      error?.response?.data?.message || "ไม่สามารถดึงข้อมูลหมวดหมู่ตาม ID ได้";
+
+    throw new Error(msg);
   }
 };
 
@@ -29,9 +43,10 @@ export const createCategory = async (formcategory) => {
     });
     return response.data.message || "สร้างหมวดหมู่สำเร็จ";
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการสร้างหมวดหมู่", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
-      throw { errors }; // ส่ง array กลับไปให้ frontend แสดงรวมกัน
+      throw { errors };
     }
     const msg = error?.response?.data?.message || "ไม่สามารถสร้างหมวดหมู่ได้";
     throw new Error(msg);
@@ -46,11 +61,12 @@ export const updateCategory = async (id, formcategory) => {
 
     return response.data.message || "อัพเดทหมวดหมู่สำเร็จ";
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการอัพเดทข้อมูลหมวดหมู่", error);
     const errors = error?.response?.data?.errors;
     if (Array.isArray(errors)) {
       throw { errors };
     }
-    const msg = error?.response?.data?.message || "ไม่สามารถแก้ไขหมวดหมู่ได้";
+    const msg = error?.response?.data?.message || "ไม่สามารถอัพเดทหมวดหมู่ได้";
     throw new Error(msg);
   }
 };
@@ -63,8 +79,13 @@ export const deleteCategory = async (id) => {
 
     return response.data.message || "ลบหมวดหมู่สำเร็จ";
   } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการลบหมวดหมู่", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
     const msg = error?.response?.data?.message || "ไม่สามารถลบหมวดหมู่ได้";
-    console.error("Error ไม่สามารถลบหมวดหมู่ได้:", error);
+
     throw new Error(msg);
   }
 };

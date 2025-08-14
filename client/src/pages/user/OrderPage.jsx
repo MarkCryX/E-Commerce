@@ -6,10 +6,13 @@ import {
   uploadPaymentSlip,
 } from "@/api/orders";
 import { RxCross1 } from "react-icons/rx";
+import { toast } from "react-toastify";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 const OrderPage = () => {
   const { user, loading } = useAuth();
   const [ordersData, setOrdersData] = useState([]);
+  const [error, setError] = useState(null);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [modalQrcode, setModalQrcode] = useState(false);
   const [imgQRCode, setImgQRCode] = useState("");
@@ -24,7 +27,9 @@ const OrderPage = () => {
       const response = await genQRCodeForOrder(order._id);
       setImgQRCode(response.qrCodeData);
     } catch (error) {
-      console.error("เกิดข้อผิดพลาดในการดึง QR Code", error);
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -37,10 +42,13 @@ const OrderPage = () => {
       const slipUrl = reader.result;
       setPaymentSlipBase64(slipUrl);
       try {
-        const res = await uploadPaymentSlip(orderId, slipUrl);
-        console.log(res.message);
-      } catch (err) {
-        console.error("อัปโหลดสลิปล้มเหลว", err);
+        const response = await uploadPaymentSlip(orderId, slipUrl);
+        console.log(response.message);
+      } catch (error) {
+        const message = extractErrorMessage(error);
+        console.error("อัปโหลดสลิปล้มเหลว", error);
+        setError(message);
+        toast.error(message);
       }
     };
     reader.readAsDataURL(file);
@@ -52,7 +60,10 @@ const OrderPage = () => {
         const response = await fetchOrders();
         setOrdersData(response);
       } catch (error) {
-        console.error("เกิดข้อผิดพลาดขณะโหลดคำสั่งซื้อ", error);
+        const message = extractErrorMessage(error);
+        console.error("ไม่สามารถดึงข้อมูลคำสั่งซื้อได้", error);
+        setError(message);
+        toast.error(message);
       } finally {
         setLoadingOrders(false);
       }

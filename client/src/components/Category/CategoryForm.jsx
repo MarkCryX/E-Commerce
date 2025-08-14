@@ -16,11 +16,11 @@ const CategoryForm = ({ closemodal, mode, onSuccess, categorydata }) => {
     try {
       if (mode === "create") {
         const response = await createCategory({ name: name.trim() });
-        
         setName("");
         onSuccess();
         closemodal();
         toast.success(response || "สร้างหมวดหมู่สำเร็จ");
+        
       } else if (mode === "edit" && categorydata) {
         const response = await updateCategory(categorydata._id, {
           name: name.trim(),
@@ -30,8 +30,8 @@ const CategoryForm = ({ closemodal, mode, onSuccess, categorydata }) => {
         closemodal();
         toast.success(response || "อัพเดทหมวดหมู่สำเร็จ");
       }
-    } catch (err) {
-      const message = extractErrorMessage(err);
+    } catch (error) {
+      const message = extractErrorMessage(error);
       setError(message);
       toast.error(message);
     } finally {

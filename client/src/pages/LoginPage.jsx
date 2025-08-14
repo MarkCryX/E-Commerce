@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { extractErrorMessage } from "@/utils/errorHelper";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,14 +15,16 @@ const LoginPage = () => {
     setLocalLoading(true);
     try {
       // await new Promise((resolve) => setTimeout(resolve, 50000));
-      const result = await login(email, password);
-      if (result.success) {
-        toast.success(result.message);
+      const response = await login(email, password);
+      if (response.success) {
+        toast.success(response.message);
       } else {
-        toast.error(result.message);
+        toast.error(response.message);
       }
     } catch (error) {
-      console.error("ล็อกอินล้มเหลว", error);
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     } finally {
       setLocalLoading(false);
     }

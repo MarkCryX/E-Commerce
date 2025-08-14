@@ -4,6 +4,7 @@ import CategoryCard from "@/components/Category/CategoryCard";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import CategoryForm from "@/components/Category/CategoryForm";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 const ManageCategory = () => {
   const [categories, setCategories] = useState([]);
@@ -14,11 +15,12 @@ const ManageCategory = () => {
   const loadCategories = async () => {
     try {
       // await new Promise((resolve) => setTimeout(resolve, 5000));
-      const data = await fetchCategory();
-      setCategories(data);
-    } catch (err) {
-      setError("ไม่สามารถโหลดหมวดหมู่ได้");
-      toast.error(err?.response?.data?.message || "ไม่สามารถโหลดหมวดหมู่ได้")
+      const response = await fetchCategory();
+      setCategories(response);
+    } catch (error) {
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -27,9 +29,6 @@ const ManageCategory = () => {
   useEffect(() => {
     loadCategories();
   }, []);
-
- 
-  
 
   return (
     <div className="max-h-screen overflow-y-auto rounded-lg bg-white p-6 shadow-md">
@@ -71,7 +70,11 @@ const ManageCategory = () => {
         )}
       </div>
       {modalOpen && (
-        <CategoryForm closemodal={() => setModalOpen(false)} mode="create" onSuccess={loadCategories}  />
+        <CategoryForm
+          closemodal={() => setModalOpen(false)}
+          mode="create"
+          onSuccess={loadCategories}
+        />
       )}
     </div>
   );

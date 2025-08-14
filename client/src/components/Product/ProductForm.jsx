@@ -37,8 +37,9 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
       const response = await fetchCategory();
       setCategories(response);
     } catch (error) {
-      console.error("เกิดข้อผิดพลาดในการดึงข้อมูล", error);
-      setError(error);
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -105,11 +106,10 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
 
       e.target.value = null; // เคลียร์ input
       toast.success("อัปโหลดรูปภาพสำเร็จ!");
-    } catch (err) {
-      console.error("Error uploading images:", err);
-      const message = extractErrorMessage(err);
+    } catch (error) {
+      const message = extractErrorMessage(error);
       setError(message);
-      toast.error("อัปโหลดรูปภาพไม่สำเร็จ");
+      toast.error(message);
     } finally {
       setImageUploadLoading(false);
       setUploading(false);
@@ -131,11 +131,10 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
           (img) => img.public_id !== imageToRemove.public_id,
         ),
       }));
-    } catch (err) {
-      console.error("Error removing image:", err);
-      const message = extractErrorMessage(err);
-      setError("เกิดข้อผิดพลาดในการลบรูปภาพ: " + message);
-      toast.error("ลบรูปภาพไม่สำเร็จ: " + message);
+    } catch (error) {
+      const message = extractErrorMessage(error);
+      setError(message);
+      toast.error(message);
     }
   };
 
@@ -184,9 +183,8 @@ const ProductForm = ({ mode, productData, onSuccess, closemodal }) => {
       if (closemodal) closemodal();
 
       navigate("/admin/manage-product");
-    } catch (err) {
-      console.error("Error submitting product form:", err);
-      const message = extractErrorMessage(err);
+    } catch (error) {
+      const message = extractErrorMessage(error);
       setError(message);
       toast.error(message);
     } finally {
