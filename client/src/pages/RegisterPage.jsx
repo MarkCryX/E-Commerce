@@ -45,10 +45,9 @@ const RegisterPage = () => {
       toast.success("สมัครสมาชิกสำเร็จ");
       navigate("/login");
     } catch (error) {
-      const message = extractErrorMessage(error);
       console.error("เกิดข้อผิดพลาดระหว่างการสมัครสมาชิก", error);
-      setError(message);
-      toast.error(message);
+      const errors = error?.response?.data?.errors;
+      setError(errors);
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +79,7 @@ const RegisterPage = () => {
             maxLength={30}
             minLength={3}
             onChange={(e) => setUsername(e.target.value)}
-            // autocomplete="username"
+            autoComplete="username"
           />
           {error &&
             error
@@ -97,7 +96,7 @@ const RegisterPage = () => {
             type="email"
             id="email"
             name="email"
-            placeholder="Enter your email"
+            placeholder="กรอกอีเมลของคุณ"
             className="mt-2 w-full rounded border border-gray-300 p-2"
             required
             value={email}
@@ -107,7 +106,7 @@ const RegisterPage = () => {
                 prev ? prev.filter((item) => item.path !== "email") : null,
               );
             }}
-            // autoComplete="email"
+            autoComplete="email"
           />
           {error &&
             error
@@ -130,13 +129,13 @@ const RegisterPage = () => {
             type="password"
             id="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="กรอกรหัสผ่านของคุณ"
             className="mt-2 w-full rounded border border-gray-300 p-2"
             required
             minLength={3}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            // autoComplete="password"
+            autoComplete="password"
           />
           {error &&
             error
@@ -153,13 +152,13 @@ const RegisterPage = () => {
             type="password"
             id="confirmPassword"
             name="confirmPassword"
-            placeholder="Confirm your password"
+            placeholder="ยืนยันรหัสผ่านของคุณ"
             className="mt-2 w-full rounded border border-gray-300 p-2"
             required
             minLength={3}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            // autoComplete="new-password"
+            autoComplete="new-password"
           />
           {password !== confirmPassword && confirmPassword !== "" && (
             <p className="text-sm text-red-500">*password ไม่ตรงกัน</p>
