@@ -24,27 +24,27 @@ exports.register = async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ message: "This email is already in use" });
+      return res.status(400).json({ message: "อีเมลนี้ถูกใช้ไปแล้ว" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const finalProfileImageURL =
+    const ProfileImageURL =
       "https://res.cloudinary.com/dim59skus/image/upload/v1753422716/blank-profile-picture-973460_1280_kpbjpk.png";
 
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
-      profileImage: finalProfileImageURL,
+      profileImage: ProfileImageURL,
     });
 
     await newUser.save();
 
-    res.status(201).json({ message: "Registration successful" });
+    res.status(201).json({ message: "สมัครสมาชิกสำเร็จ" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error occurred" });
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
 
@@ -61,13 +61,13 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({ message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" });
     }
 
     const accessToken = jwt.sign(
@@ -117,7 +117,7 @@ exports.login = async (req, res) => {
       .json({ message: "ล็อกอินสำเร็จ", user: userWithoutPassword });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error occurred" });
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
 
@@ -255,7 +255,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(200).json(users);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Failed to fetch users" });
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
 
@@ -290,7 +290,7 @@ exports.getUserById = async (req, res) => {
         .json({ message: "Invalid user ID format in database" });
     }
 
-    res.status(500).json({ message: "Failed to fetch user data" });
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
 
@@ -337,8 +337,8 @@ exports.logout = async (req, res) => {
   res.setHeader("Expires", "0");
 
   res.status(200).json({
-    message: "Logout successful",
-    loggedOut: true, // เพิ่ม flag เพื่อให้ Frontend รู้ว่า logout สำเร็จ
+    message: "ล็อกเอาท์สำเร็จ",
+    loggedOut: true,
   });
 };
 
@@ -391,7 +391,7 @@ exports.createAddress = async (req, res) => {
       // ส่ง status 400 Bad Request พร้อมข้อความ error ที่ชัดเจน
       return res.status(400).json({ message: messages });
     }
-    res.status(500).json({ message: "Server error occurred" });
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
 

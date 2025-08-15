@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCart } from "@/context/CartContext";
 import { BsCart2 } from "react-icons/bs";
+import { toast } from "react-toastify";
 
 function NavBar({ isAuthenticated, user, logout }) {
   const { cart } = useCart();
@@ -17,6 +18,7 @@ function NavBar({ isAuthenticated, user, logout }) {
 
   const handleLogout = async () => {
     const result = await logout(); // เรียกใช้ logout จาก AuthContext
+    toast.success(result);
   };
 
   const activeLink = ({ isActive }) =>

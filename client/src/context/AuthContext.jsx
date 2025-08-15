@@ -259,14 +259,13 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       // 3. จัดการข้อผิดพลาดในการ Login
-      console.error("❌ Login failed:", error);
+      console.error("เกิดข้อผิดพลาดในการล็อกอิน", error);
       setIsAuthenticated(false);
       setUser(null);
       setLoading(false);
       return {
         success: false,
-        message:
-          error.response?.data?.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ",
+        message: error.response?.data?.message || "เกิดข้อผิดพลาดในการล็อกอิน",
       };
     }
   };
@@ -285,60 +284,17 @@ export const AuthProvider = ({ children }) => {
       isCheckingAuthRef.current = false;
 
       // 3. ส่งคำขอ Logout ไปยัง Backend
-      await axios.post(
+      const response = await axios.post(
         `${import.meta.env.VITE_BACK_END_URL}/api/logout`,
         {},
         { withCredentials: true },
       );
 
-      // 4. ลบ Cookies ทั้งหมดที่เกี่ยวข้องกับ Domain ปัจจุบัน
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        let cookie = cookies[i];
-        while (cookie.charAt(0) === " ") {
-          cookie = cookie.substring(1);
-        }
-        const eqPos = cookie.indexOf("=");
-        const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie;
-        document.cookie =
-          name +
-          "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" +
-          window.location.hostname;
-        document.cookie =
-          name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;";
-      }
-
-      // 5. ทำความสะอาด Storage ต่างๆ (sessionStorage, indexedDB, cache)
-      sessionStorage.clear();
-      if (indexedDB) {
-        indexedDB.databases().then((dbs) => {
-          dbs.forEach((db) => indexedDB.deleteDatabase(db.name));
-        });
-      }
-
-      if ("caches" in window) {
-        caches.keys().then((cacheNames) => {
-          cacheNames.forEach((cacheName) => caches.delete(cacheName));
-        });
-      }
-
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-          registrations.forEach((registration) => registration.unregister());
-        });
-      }
-
-      // 6. เปลี่ยน URL ไปยัง /login และโหลดหน้าใหม่
-      window.history.replaceState(null, "", "/login");
-      setTimeout(() => {
-        window.location.replace("/login");
-      }, 100);
-
-      return { success: true, message: "ออกจากระบบสำเร็จ" };
+      return response.data.message
     } catch (error) {
       // 7. จัดการข้อผิดพลาดในการ Logout
-      console.error("❌ Logout failed:", error);
-      toast.error("เกิดข้อผิดพลาดในการออกจากระบบ");
+      console.error("เกิดข้อผิดพลาดในการล็อกเอาท์", error);
+      toast.error("เกิดข้อผิดพลาดในการล็อกเอาท์");
     }
   };
 
