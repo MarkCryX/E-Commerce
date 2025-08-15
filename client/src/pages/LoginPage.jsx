@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import { FaSpinner } from "react-icons/fa";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import { extractErrorMessage } from "@/utils/errorHelper";
+
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -1,6 +1,6 @@
 // src/layouts/AdminLayout.jsx
 import { Outlet, Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // เพื่อใช้ logout
+import { useAuth } from "@/hooks/useAuth"; // เพื่อใช้ logout
 import { FaTachometerAlt, FaUsers, FaBox, FaSignOutAlt } from "react-icons/fa"; // ตัวอย่างไอคอน
 import SidebarAdmin from "../components/SidebarAdmin";
 import { useEffect } from "react";

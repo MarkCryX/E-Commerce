@@ -1,16 +1,13 @@
 // src/pages/ProfilePage.jsx
-import { useAuth } from "../../context/AuthContext";
-import { useEffect } from "react"; // Don't forget to import useEffect if you use it
+import { useAuth } from "@/hooks/useAuth";
 
 const ProfilePage = () => {
-  const { user, loading } = useAuth(); // Destructure user, loading, isAuthenticated
+  const { user, loading } = useAuth(); 
 
   if (loading) {
-    return <div>Loading profile...</div>; // Show loading state
+    return <div>Loading profile...</div>; 
   }
-  // console.log(user);
 
-  // Render user data
   return (
     <div className="my-8 rounded-lg bg-white p-6 shadow-md">
       <h1 className="mb-6 text-center text-3xl font-bold">Your Profile</h1>

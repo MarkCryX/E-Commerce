@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import { extractErrorMessage } from "@/utils/errorHelper";
 const RegisterPage = () => {

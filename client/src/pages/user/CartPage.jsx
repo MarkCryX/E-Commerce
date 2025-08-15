@@ -1,13 +1,14 @@
 import { useCart } from "@/context/CartContext";
 import { MdDeleteOutline } from "react-icons/md";
 import { Link, NavLink } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { createOrder } from "@/api/orders";
 import { toast } from "react-toastify";
 import AddressModal from "@/components/UserAccount/Adress/AddressModal";
 import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelper";
+
 const CartPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
