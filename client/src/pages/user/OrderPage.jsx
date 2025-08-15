@@ -33,7 +33,7 @@ const OrderPage = () => {
     }
   };
 
-  const handleSlipChange = async (event, orderId) => {
+  const handleUploadSlip = async (event, orderId) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -43,10 +43,9 @@ const OrderPage = () => {
       setPaymentSlipBase64(slipUrl);
       try {
         const response = await uploadPaymentSlip(orderId, slipUrl);
-        console.log(response.message);
+        toast.success(response.message)
       } catch (error) {
         const message = extractErrorMessage(error);
-        console.error("อัปโหลดสลิปล้มเหลว", error);
         setError(message);
         toast.error(message);
       }
@@ -61,7 +60,6 @@ const OrderPage = () => {
         setOrdersData(response);
       } catch (error) {
         const message = extractErrorMessage(error);
-        console.error("ไม่สามารถดึงข้อมูลคำสั่งซื้อได้", error);
         setError(message);
         toast.error(message);
       } finally {
@@ -164,7 +162,7 @@ const OrderPage = () => {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => handleSlipChange(e, order._id)}
+                      onChange={(e) => handleUploadSlip(e, order._id)}
                       className="hidden"
                     />
                   </label>
