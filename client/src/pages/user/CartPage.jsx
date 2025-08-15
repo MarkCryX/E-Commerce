@@ -1,4 +1,4 @@
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/hooks/useCart";
 import { MdDeleteOutline } from "react-icons/md";
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";

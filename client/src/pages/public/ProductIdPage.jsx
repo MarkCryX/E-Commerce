@@ -10,7 +10,7 @@ import "swiper/css/pagination";
 import "swiper/css/thumbs";
 import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/useAuth";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/hooks/useCart";
 import { FaCartPlus } from "react-icons/fa";
 import { extractErrorMessage } from "@/utils/errorHelper";
 

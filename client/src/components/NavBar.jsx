@@ -7,9 +7,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCart } from "@/context/CartContext";
 import { BsCart2 } from "react-icons/bs";
 import { toast } from "react-toastify";
+import { useCart } from "@/hooks/useCart";
 
 function NavBar({ isAuthenticated, user, logout }) {
   const { cart } = useCart();
