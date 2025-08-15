@@ -3,7 +3,8 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuth } from "@/hooks/useAuth";
-import SidebarUser from "@/components/UserAccount/SidebarUser";
+import SidebarUser from "@/components/User/SidebarUser";
+
 
 const UserLayout = () => {
   const { isAuthenticated, user, logout } = useAuth();

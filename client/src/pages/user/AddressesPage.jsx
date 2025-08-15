@@ -7,8 +7,8 @@ import {
   updateAdress,
 } from "@/api/accountuser";
 import { useState } from "react";
-import AddressCard from "@/components/UserAccount/Adress/AddressCard";
 import { extractErrorMessage } from "@/utils/errorHelper";
+import AddressCard from "@/components/User/Adress/AddressCard";
 
 const AddressesPage = () => {
   const { user, loading, setUser } = useAuth();

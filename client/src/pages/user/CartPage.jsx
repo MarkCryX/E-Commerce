@@ -5,9 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { createOrder } from "@/api/orders";
 import { toast } from "react-toastify";
-import AddressModal from "@/components/UserAccount/Adress/AddressModal";
 import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelper";
+import AddressModal from "@/components/User/Adress/AddressModal";
 
 const CartPage = () => {
   const navigate = useNavigate();
