@@ -15,6 +15,9 @@ export const extractErrorMessage = (err) => {
     return filteredUniqueMessages.join(" และ ");
   }
 
+  if(err?.message === "Access token missing, please refresh" ){
+    return null
+  }
   // กรณีที่ err มี property message เป็น string
   if (typeof err?.message === 'string') {
     return err.message;
