@@ -111,6 +111,21 @@ exports.getOrdersAdmin = async (req, res) => {
   }
 };
 
+exports.getOrdersCompleted = async (req, res) => {
+  try {
+    const orders = await Order.find({ isCompleted: true })
+      .sort({
+        createdAt: -1,
+      })
+      .select("-paymentSlip");
+
+    return res.status(200).json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิฟเวอร์" });
+  }
+};
+
 exports.updateStatusOrder = async (req, res) => {
   const errors = validationResult(req);
 

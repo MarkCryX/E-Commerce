@@ -58,6 +58,26 @@ export const fetchOrdersAdmin = async () => {
   }
 };
 
+export const getOrdersCompleted = async () => {
+  try {
+    const response = await axios.get(`${API_BASE}/complete`, {
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลคำสั่งซื้อที่สำเร็จแล้ว", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg =
+      error?.response?.data?.message ||
+      "ไม่สามารถดึงข้อมูลคำสั่งซื้อที่สำเร็จได้";
+    throw new Error(msg);
+  }
+};
+
 export const updateStatusOrder = async (id, status) => {
   try {
     const response = await axios.patch(
