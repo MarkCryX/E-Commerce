@@ -28,8 +28,9 @@ app.use(express.json());
 // }));
 
 app.use("/api", require("./Routes/productsRoutes"));
-app.use("/api/products/highlight", require("./Routes/productHighlightRoutes"))
+app.use("/api", require("./Routes/productHighlightRoutes"));
 app.use("/api", require("./Routes/usersRoutes"));
+app.use("/api", require("./Routes/authRoutes"));
 app.use("/api", require("./Routes/ordersRoutes"));
 app.use("/api", require("./Routes/imageUploadRoutes"));
 app.use("/api", require("./Routes/categoryRoutes"));

@@ -237,7 +237,7 @@ export const AuthProvider = ({ children }) => {
     try {
       // 1. ส่งคำขอ Login ไปยัง Backend
       const response = await axios.post(
-        `${import.meta.env.VITE_BACK_END_URL}/api/login`,
+        `${import.meta.env.VITE_BACK_END_URL}/api/auth/login`,
         { email, password },
         { withCredentials: true }, // ส่ง cookie ไปด้วย
       );
@@ -285,7 +285,7 @@ export const AuthProvider = ({ children }) => {
 
       // 3. ส่งคำขอ Logout ไปยัง Backend
       const response = await axios.post(
-        `${import.meta.env.VITE_BACK_END_URL}/api/logout`,
+        `${import.meta.env.VITE_BACK_END_URL}/api/auth/logout`,
         {},
         { withCredentials: true },
       );

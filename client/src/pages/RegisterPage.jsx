@@ -30,7 +30,7 @@ const RegisterPage = () => {
       setIsLoading(true);
       // await new Promise((resolve) => setTimeout(resolve, 10000));
       const response = await axios.post(
-        `${import.meta.env.VITE_BACK_END_URL}/api/register`,
+        `${import.meta.env.VITE_BACK_END_URL}/api/auth/register`,
         userData,
       );
 
