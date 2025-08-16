@@ -35,7 +35,7 @@ const ManageProductsPage = () => {
 
     try {
       const response = await deleteProduct(productId);
-      toast.success(response);
+      toast.success(response.message);
       loadProducts();
     } catch (error) {
       const message = extractErrorMessage(error);
