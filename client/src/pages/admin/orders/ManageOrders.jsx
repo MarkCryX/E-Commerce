@@ -82,6 +82,8 @@ const ManageOrders = () => {
     loadOrders();
   }, []);
 
+  console.log(orders);
+
   return (
     <div className="ml-3 rounded-lg bg-white p-6 shadow-md">
       <h1 className="mb-4 text-3xl font-bold text-gray-800">จัดการออเดอร์</h1>
@@ -101,6 +103,16 @@ const ManageOrders = () => {
                   </p>
                   <p className="text-sm text-gray-600">
                     สถานะ: <span className="font-semibold">{order.status}</span>
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    วิธีการชำระเงิน:{" "}
+                    <span className="font-semibold">
+                      {order.payment === "cod"
+                        ? "เก็บเงินปลายทาง"
+                        : order.payment === "promptpay"
+                          ? "พร้อมเพย์ / QR Code"
+                          : order.payment}
+                    </span>
                   </p>
                   <p className="text-sm text-gray-600">
                     ชำระเงิน:{" "}
@@ -146,7 +158,8 @@ const ManageOrders = () => {
                   {order.shippingAddress.province}{" "}
                   {order.shippingAddress.postalCode}
                 </div>
-                {order.paymentstatus === "ชำระเสร็จสิ้น" && (
+                {(order.paymentstatus === "ชำระเสร็จสิ้น" ||
+                  order.payment === "cod") && (
                   <div className="flex items-center gap-2">
                     <p>อัพเดทสถานะออเดอร์: </p>
                     <select
