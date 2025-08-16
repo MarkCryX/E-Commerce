@@ -5,7 +5,7 @@ import {
   createAddress,
   deleteAddress,
   updateAdress,
-} from "@/api/accountuser";
+} from "@/api/user";
 import { useState } from "react";
 import { extractErrorMessage } from "@/utils/errorHelper";
 import AddressCard from "@/components/User/Adress/AddressCard";
