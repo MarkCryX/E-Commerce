@@ -17,7 +17,6 @@ const OrderPage = () => {
   const [modalQrcode, setModalQrcode] = useState(false);
   const [imgQRCode, setImgQRCode] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [paymentSlipBase64, setPaymentSlipBase64] = useState("");
 
   const handleOpenModal = async (order) => {
     setSelectedOrder(order);
@@ -40,10 +39,12 @@ const OrderPage = () => {
     const reader = new FileReader();
     reader.onloadend = async () => {
       const slipUrl = reader.result;
-      setPaymentSlipBase64(slipUrl);
       try {
         const response = await uploadPaymentSlip(orderId, slipUrl);
-        toast.success(response.message)
+        setOrdersData((prev) =>
+          prev.map((order) => (order._id === orderId ? response.order : order)),
+        );
+        toast.success(response.message);
       } catch (error) {
         const message = extractErrorMessage(error);
         setError(message);
@@ -68,7 +69,7 @@ const OrderPage = () => {
     };
 
     loadOrders();
-  }, [user, paymentSlipBase64]);
+  }, [user]);
 
   if (loading) return <p>กำลังโหลด...</p>;
 
