@@ -16,7 +16,7 @@ exports.createOrder = async (req, res) => {
   try {
     const userId = req.user._id; //ดึงมาจาก authcheck
     const { products, shippingAddress, payment } = req.body;
-    console.log(products);
+
     if (!shippingAddress || !shippingAddress.name || !shippingAddress.phone) {
       return res.status(400).json({ message: "ข้อมูลที่อยู่ไม่ถูกต้อง" });
     }
