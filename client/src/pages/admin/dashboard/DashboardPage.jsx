@@ -2,25 +2,9 @@ import { getDashboardStats } from "@/api/dashboard";
 import { extractErrorMessage } from "@/utils/errorHelper";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-);
+import SummaryCards from "@/components/Dashboard/SummaryCards";
+import DashboardChart from "@/components/Dashboard/DashboardChart";
+import { FaBoxOpen, FaDollarSign, FaShoppingCart, FaUsers } from "react-icons/fa";
 
 const DashboardPage = () => {
   const [dataDashboard, setDataDashboard] = useState([]);
@@ -45,61 +29,89 @@ const DashboardPage = () => {
   const uniqueCustomers = dataDashboard?.summary?.uniqueCustomers || 0;
   const totalProducts = dataDashboard?.summary?.totalProducts || 0;
 
+  //ยอดขายรายวัน
+  const dailySalesLabels = Object.keys(dataDashboard.salesByDay || {});
+  const dailySalesData = Object.values(dataDashboard.salesByDay || {});
+
+  //ยอดขายรายเดือน
+  const monthSalesLabels = Object.keys(dataDashboard.salesByMonth || {});
+  const monthSalesData = Object.values(dataDashboard.salesByMonth || {});
+
+  //จำนวนออเดอร์รายวัน
+  const dailyOrdersLabels = Object.keys(dataDashboard.ordersByDay || {});
+  const dailyOrdersData = Object.values(dataDashboard.ordersByDay || {});
+
+  //จำนวนออเดอร์รายเดือน
+  const monthOrdersLabels = Object.keys(dataDashboard.ordersByMonth || {});
+  const monthOrdersData = Object.values(dataDashboard.ordersByMonth || {});
+
   useEffect(() => {
     fetchDashboardStats();
   }, []);
 
-  const data = {
-    labels: ["14/08", "15/08", "16/08", "17/08"],
-    datasets: [
-      {
-        label: "ยอดขาย (บาท)",
-        data: [2000, 3500, 1800, 5000],
-        backgroundColor: "rgba(75,192,192,0.5)",
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "Monthly Sales Report",
-      },
-    },
-  };
-
-
   return (
     <div className="ml-3 p-6">
       <div className="mb-10 grid grid-cols-1 gap-5 text-center md:grid-cols-4">
-        <div className="rounded-md bg-white p-5 shadow-md">
-          <h3>จำนวนออเดอร์สำเร็จทั้งหมด</h3>
-          <p>{totalOrders} ออเดอร์</p>
+        <SummaryCards
+          icon={<FaShoppingCart size={40} className="text-blue-500"/>}
+          title={"จำนวนออเดอร์สำเร็จทั้งหมด"}
+          value={totalOrders}
+          unit={"ออเดอร์"}
+        />
+        <SummaryCards
+          icon={<FaDollarSign size={40} className="text-green-500"/>}
+          title={"ยอดขายรวมทั้งหมด"}
+          value={totalSales}
+          unit={"บาท"}
+        />
+        <SummaryCards
+          icon={<FaUsers size={40} className="text-purple-500" />}
+          title={"จำนวนลูกค้าที่สั่งซื้อแล้ว (ไม่ซ้ำ)"}
+          value={uniqueCustomers}
+          unit={"คน"}
+        />
+        <SummaryCards
+          icon={<FaBoxOpen size={40} className="text-orange-500" />}
+          title={"จำนวนสินค้ารวมที่ขายได้"}
+          value={totalProducts}
+          unit={"ชิ้น"}
+        />
+      </div>
+
+      <div className="mb-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div className="w-full max-w-4xl rounded-md bg-white p-5 shadow-md">
+          <DashboardChart
+            title={"ยอดขายรายวัน"}
+            labels={dailySalesLabels}
+            data={dailySalesData}
+            type={"line"}
+          />
         </div>
-        <div className="rounded-md bg-white p-5 shadow-md">
-          <h3>ยอดขายรวมทั้งหมด</h3>
-          <p>{totalSales} บาท</p>
-        </div>
-        <div className="rounded-md bg-white p-5 shadow-md">
-          <h3>จำนวนลูกค้าที่สั่งซื้อแล้ว (ไม่ซ้ำ)</h3>
-          <p>{uniqueCustomers} คน</p>
-        </div>
-        <div className="rounded-md bg-white p-5 shadow-md">
-          <h3>จำนวนสินค้ารวมที่ขายได้</h3>
-          <p>{totalProducts} ชิ้น</p>
+        <div className="w-full max-w-4xl rounded-md bg-white p-5 shadow-md">
+          <DashboardChart
+            title={"ยอดขายรายเดือน"}
+            labels={monthSalesLabels}
+            data={monthSalesData}
+            type={"line"}
+          />
         </div>
       </div>
-      <div className="container mx-auto grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div className="w-full max-w-3xl rounded-md bg-white p-5 shadow-md">
-          <Bar data={data} options={options} />
+      <div className="mb-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div className="w-full max-w-4xl rounded-md bg-white p-5 shadow-md">
+          <DashboardChart
+            title={"จำนวนออเดอร์รายวัน"}
+            labels={dailyOrdersLabels}
+            data={dailyOrdersData}
+            type={"bar"}
+          />
         </div>
-        <div className="w-full max-w-3xl rounded-md bg-white p-5 shadow-md">
-          <Bar data={data} options={options} />
+        <div className="w-full max-w-4xl rounded-md bg-white p-5 shadow-md">
+          <DashboardChart
+            title={"จำนวนออเดอร์รายเดือน"}
+            labels={monthOrdersLabels}
+            data={monthOrdersData}
+            type={"bar"}
+          />
         </div>
       </div>
     </div>
