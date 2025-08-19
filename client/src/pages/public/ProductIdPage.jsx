@@ -69,6 +69,7 @@ const ProductIdPage = () => {
     try {
       const newOrderItem = {
         product: product._id,
+        category: product.category.name,
         name: product.name,
         price: product.price,
         quantity: 1,

@@ -46,9 +46,12 @@ const CartPage = () => {
         return;
       }
 
+     
+      
       const orderData = {
         products: cart.map((item) => ({
           product: item.product,
+          category:item.category,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
@@ -60,6 +63,7 @@ const CartPage = () => {
         payment: paymentMethod,
       };
 
+       console.log(orderData);
       const response = await createOrder(orderData);
       clearCart();
       toast.success("สั่งซื้อสินค้าสำเร็จ");
