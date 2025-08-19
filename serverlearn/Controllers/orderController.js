@@ -16,7 +16,7 @@ exports.createOrder = async (req, res) => {
   try {
     const userId = req.user._id; //ดึงมาจาก authcheck
     const { products, shippingAddress, payment } = req.body;
-
+    console.log(products);
     if (!shippingAddress || !shippingAddress.name || !shippingAddress.phone) {
       return res.status(400).json({ message: "ข้อมูลที่อยู่ไม่ถูกต้อง" });
     }
@@ -40,13 +40,15 @@ exports.createOrder = async (req, res) => {
           .status(400)
           .json({ message: `สินค้า ${product.name} มีสต็อกไม่เพียงพอ` });
       }
-
+      
+      
       calculatedTotalAmount += product.price * item.quantity;
       orderProducts.push({
         product: product._id,
         quantity: item.quantity,
         price: product.price,
         image: product.images[0].url,
+        category: products.category,
         name: product.name,
         size: item.size,
         color: item.color,

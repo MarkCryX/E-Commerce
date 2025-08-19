@@ -18,6 +18,9 @@ const orderSchema = mongoose.Schema(
         image: {
           type: String,
         },
+        category:{
+          type: String,
+        },
         name: {
           type: String,
           required: true,
