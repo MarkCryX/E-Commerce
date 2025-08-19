@@ -97,6 +97,35 @@ exports.readOrders = async (req, res) => {
   }
 };
 
+exports.uploadPaymentSlip = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  try {
+    const { slipUrl } = req.body;
+    const orderId = req.params.id;
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      orderId,
+      { paymentSlip: slipUrl, paymentstatus: "กำลังตรวจสอบการชำระเงิน" },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "ไม่พบคำสั่งซื้อ" });
+    }
+
+    res.json({
+      message: "อัปโหลดสลิปสำเร็จ",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในการอัปโหลดสลิป" });
+  }
+};
+
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 exports.getOrdersAdmin = async (req, res) => {
   try {
@@ -108,21 +137,6 @@ exports.getOrdersAdmin = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
-  }
-};
-
-exports.getOrdersCompleted = async (req, res) => {
-  try {
-    const orders = await Order.find({ isCompleted: true })
-      .sort({
-        createdAt: -1,
-      })
-      .select("-paymentSlip");
-
-    return res.status(200).json(orders);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิฟเวอร์" });
   }
 };
 
@@ -184,35 +198,6 @@ exports.genQRCodeForOrder = async (req, res) => {
   }
 };
 
-exports.uploadPaymentSlip = async (req, res) => {
-  const errors = validationResult(req);
-
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  try {
-    const { slipUrl } = req.body;
-    const orderId = req.params.id;
-
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
-      { paymentSlip: slipUrl, paymentstatus: "กำลังตรวจสอบการชำระเงิน" },
-      { new: true }
-    );
-
-    if (!updatedOrder) {
-      return res.status(404).json({ message: "ไม่พบคำสั่งซื้อ" });
-    }
-
-    res.json({
-      message: "อัปโหลดสลิปสำเร็จ",
-      order: updatedOrder,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "เกิดข้อผิดพลาดในการอัปโหลดสลิป" });
-  }
-};
-
 exports.updatePaymemtStatus = async (req, res) => {
   const errors = validationResult(req);
 
@@ -268,3 +253,5 @@ exports.completeOrder = async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
+
+

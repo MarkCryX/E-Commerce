@@ -38,6 +38,25 @@ export const fetchOrders = async () => {
   }
 };
 
+export const uploadPaymentSlip = async (id, slipUrl) => {
+  try {
+    const response = await axios.patch(
+      `${API_BASE}/${id}/payment-slip`,
+      { slipUrl },
+      { withCredentials: true },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการอัปโหลดสลิป", error);
+    const errors = error?.response?.data?.errors;
+    if (Array.isArray(errors)) {
+      throw { errors };
+    }
+    const msg = error?.response?.data?.message || "ไม่สามารถอัปโหลดสลิปได้";
+    throw new Error(msg);
+  }
+};
+
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 export const fetchOrdersAdmin = async () => {
   try {
@@ -54,26 +73,6 @@ export const fetchOrdersAdmin = async () => {
     }
     const msg =
       error?.response?.data?.message || "ไม่สามารถดึงข้อมูลคำสั่งซื้อได้";
-    throw new Error(msg);
-  }
-};
-
-export const getOrdersCompleted = async () => {
-  try {
-    const response = await axios.get(`${API_BASE}/complete`, {
-      withCredentials: true,
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error("เกิดข้อผิดพลาดในการดึงข้อมูลคำสั่งซื้อที่สำเร็จแล้ว", error);
-    const errors = error?.response?.data?.errors;
-    if (Array.isArray(errors)) {
-      throw { errors };
-    }
-    const msg =
-      error?.response?.data?.message ||
-      "ไม่สามารถดึงข้อมูลคำสั่งซื้อที่สำเร็จได้";
     throw new Error(msg);
   }
 };
@@ -115,25 +114,6 @@ export const genQRCodeForOrder = async (id) => {
     const msg =
       error?.response?.data?.message ||
       "ไม่สามารถสร้าง QR-Code ชำระคำสั่งซื้อได้";
-    throw new Error(msg);
-  }
-};
-
-export const uploadPaymentSlip = async (id, slipUrl) => {
-  try {
-    const response = await axios.patch(
-      `${API_BASE}/${id}/payment-slip`,
-      { slipUrl },
-      { withCredentials: true },
-    );
-    return response.data;
-  } catch (error) {
-    console.error("เกิดข้อผิดพลาดในการอัปโหลดสลิป", error);
-    const errors = error?.response?.data?.errors;
-    if (Array.isArray(errors)) {
-      throw { errors };
-    }
-    const msg = error?.response?.data?.message || "ไม่สามารถอัปโหลดสลิปได้";
     throw new Error(msg);
   }
 };

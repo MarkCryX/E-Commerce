@@ -9,7 +9,6 @@ const {
   uploadPaymentSlip,
   updatePaymemtStatus,
   completeOrder,
-  getOrdersCompleted,
 } = require("../Controllers/orderController");
 const router = express.Router();
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
@@ -37,8 +36,6 @@ router.patch(
 
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 router.get("/orders", authCheck, isAdmin, getOrdersAdmin);
-
-router.get("/orders/complete", authCheck, isAdmin, getOrdersCompleted)
 
 router.patch(
   "/orders/:id/status",

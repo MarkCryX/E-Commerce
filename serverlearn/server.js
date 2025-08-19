@@ -32,6 +32,7 @@ app.use("/api", require("./Routes/productHighlightRoutes"));
 app.use("/api", require("./Routes/usersRoutes"));
 app.use("/api", require("./Routes/authRoutes"));
 app.use("/api", require("./Routes/ordersRoutes"));
+app.use("/api", require("./Routes/dashboardRoutes"))
 app.use("/api", require("./Routes/imageUploadRoutes"));
 app.use("/api", require("./Routes/categoryRoutes"));
 
