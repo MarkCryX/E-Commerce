@@ -29,7 +29,10 @@ exports.createOrder = async (req, res) => {
     const orderProducts = [];
 
     for (const item of products) {
-      const product = await Product.findById(item.product);
+      const product = await Product.findById(item.product).populate(
+        "category",
+        "name"
+      );
 
       if (!product) {
         return res.status(404).json({ message: `ไม่พบสินค้า` });
@@ -40,15 +43,15 @@ exports.createOrder = async (req, res) => {
           .status(400)
           .json({ message: `สินค้า ${product.name} มีสต็อกไม่เพียงพอ` });
       }
-      
-      
+
+
       calculatedTotalAmount += product.price * item.quantity;
       orderProducts.push({
         product: product._id,
         quantity: item.quantity,
         price: product.price,
         image: product.images[0].url,
-        category: products.category,
+        category: product.category.name,
         name: product.name,
         size: item.size,
         color: item.color,
@@ -255,5 +258,3 @@ exports.completeOrder = async (req, res) => {
     res.status(500).json({ message: "เกิดข้อผิดพลาดในเซิร์ฟเวอร์" });
   }
 };
-
-
