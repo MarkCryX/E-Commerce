@@ -62,8 +62,7 @@ const CartPage = () => {
         shippingAddress: currentAddress,
         payment: paymentMethod,
       };
-
-       console.log(orderData);
+      
       const response = await createOrder(orderData);
       clearCart();
       toast.success("สั่งซื้อสินค้าสำเร็จ");
