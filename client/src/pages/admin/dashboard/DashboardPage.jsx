@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import SummaryCards from "@/components/Dashboard/SummaryCards";
 import DashboardChart from "@/components/Dashboard/DashboardChart";
-import { FaBoxOpen, FaDollarSign, FaShoppingCart, FaUsers } from "react-icons/fa";
+import {
+  FaBoxOpen,
+  FaDollarSign,
+  FaShoppingCart,
+  FaUsers,
+} from "react-icons/fa";
 
 const DashboardPage = () => {
   const [dataDashboard, setDataDashboard] = useState([]);
@@ -45,6 +50,10 @@ const DashboardPage = () => {
   const monthOrdersLabels = Object.keys(dataDashboard.ordersByMonth || {});
   const monthOrdersData = Object.values(dataDashboard.ordersByMonth || {});
 
+  //ยอดขายสินค้าตามหมวดหมู่
+  const categorySalesLabels = Object.keys(dataDashboard.salesByCategory || {});
+  const categorySalesData = Object.values(dataDashboard.salesByCategory || {});
+
   useEffect(() => {
     fetchDashboardStats();
   }, []);
@@ -53,13 +62,13 @@ const DashboardPage = () => {
     <div className="ml-3 p-6">
       <div className="mb-10 grid grid-cols-1 gap-5 text-center md:grid-cols-4">
         <SummaryCards
-          icon={<FaShoppingCart size={40} className="text-blue-500"/>}
+          icon={<FaShoppingCart size={40} className="text-blue-500" />}
           title={"จำนวนออเดอร์สำเร็จทั้งหมด"}
           value={totalOrders}
           unit={"ออเดอร์"}
         />
         <SummaryCards
-          icon={<FaDollarSign size={40} className="text-green-500"/>}
+          icon={<FaDollarSign size={40} className="text-green-500" />}
           title={"ยอดขายรวมทั้งหมด"}
           value={totalSales}
           unit={"บาท"}
@@ -111,6 +120,16 @@ const DashboardPage = () => {
             labels={monthOrdersLabels}
             data={monthOrdersData}
             type={"bar"}
+          />
+        </div>
+      </div>
+      <div>
+        <div className="w-full max-w-xl rounded-md bg-white p-5 shadow-md">
+          <DashboardChart
+            title={"ยอดขายสินค้าตามหมวดหมู่"}
+            labels={categorySalesLabels}
+            data={categorySalesData}
+            type={"pie"}
           />
         </div>
       </div>
