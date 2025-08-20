@@ -10,7 +10,7 @@ exports.getDashboardStats = async (req, res) => {
 
     //จำนวนออเดอร์สำเร็จทั้งหมด
     const totalOrders = orders.length;
-    
+
     //ยอดขายรวมทั้งหมด
     const totalSales = orders.reduce(
       (total, order) => order.totalAmount + total,
@@ -58,7 +58,22 @@ exports.getDashboardStats = async (req, res) => {
     const ordersByMonth = orders.reduce((acc, order) => {
       const month = order.createdAt.toISOString().slice(0, 7); // YYYY-MM
       if (!acc[month]) acc[month] = 0;
-      acc[month]++
+      acc[month]++;
+      return acc;
+    }, {});
+
+    // ยอดขายตามหมวดหมู่
+    const salesByCategory = orders.reduce((acc, order) => {
+      order.products.forEach((product) => {
+        const category = product.category; // ใช้ชื่อสินค้าเป็น key
+        const sales = product.price * product.quantity; // ยอดขาย = ราคา x จำนวน
+
+        if (!acc[category]) {
+          acc[category] = 0;
+        }
+        acc[category] += sales;
+      });
+
       return acc;
     }, {});
 
@@ -73,6 +88,7 @@ exports.getDashboardStats = async (req, res) => {
       salesByMonth,
       ordersByDay,
       ordersByMonth,
+      salesByCategory,
     };
 
     return res.status(200).json(result);
