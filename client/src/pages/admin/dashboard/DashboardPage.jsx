@@ -54,13 +54,16 @@ const DashboardPage = () => {
   const categorySalesLabels = Object.keys(dataDashboard.salesByCategory || {});
   const categorySalesData = Object.values(dataDashboard.salesByCategory || {});
 
+  //สินค้าขายดีที่สุด 5 อันดับแรก
+  const topSellingProducts = dataDashboard.topSellingProducts || [];
+
   useEffect(() => {
     fetchDashboardStats();
   }, []);
 
   return (
     <div className="ml-3 p-6">
-      <div className="mb-10 grid grid-cols-1 gap-5 text-center md:grid-cols-4">
+      <div className="mb-10 grid grid-cols-1 gap-5 text-center md:grid-cols-2 lg:grid-cols-4">
         <SummaryCards
           icon={<FaShoppingCart size={40} className="text-blue-500" />}
           title={"จำนวนออเดอร์สำเร็จทั้งหมด"}
@@ -88,7 +91,7 @@ const DashboardPage = () => {
       </div>
 
       <div className="mb-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div className="w-full max-w-4xl rounded-md bg-white p-5 shadow-md">
+        <div className="max-w-4xl min-w-full rounded-md bg-white p-5 shadow-md">
           <DashboardChart
             title={"ยอดขายรายวัน"}
             labels={dailySalesLabels}
@@ -96,7 +99,7 @@ const DashboardPage = () => {
             type={"line"}
           />
         </div>
-        <div className="w-full max-w-4xl rounded-md bg-white p-5 shadow-md">
+        <div className="max-w-4xl min-w-full rounded-md bg-white p-5 shadow-md">
           <DashboardChart
             title={"ยอดขายรายเดือน"}
             labels={monthSalesLabels}
@@ -106,7 +109,7 @@ const DashboardPage = () => {
         </div>
       </div>
       <div className="mb-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <div className="w-full max-w-4xl rounded-md bg-white p-5 shadow-md">
+        <div className="max-w-4xl min-w-full rounded-md bg-white p-5 shadow-md">
           <DashboardChart
             title={"จำนวนออเดอร์รายวัน"}
             labels={dailyOrdersLabels}
@@ -114,7 +117,7 @@ const DashboardPage = () => {
             type={"bar"}
           />
         </div>
-        <div className="w-full max-w-4xl rounded-md bg-white p-5 shadow-md">
+        <div className="max-w-4xl min-w-full rounded-md bg-white p-5 shadow-md">
           <DashboardChart
             title={"จำนวนออเดอร์รายเดือน"}
             labels={monthOrdersLabels}
@@ -123,14 +126,42 @@ const DashboardPage = () => {
           />
         </div>
       </div>
-      <div>
-        <div className="w-full max-w-xl rounded-md bg-white p-5 shadow-md">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+        <div className="max-w-xl min-w-full rounded-md bg-white p-5 shadow-md">
           <DashboardChart
             title={"ยอดขายสินค้าตามหมวดหมู่"}
             labels={categorySalesLabels}
             data={categorySalesData}
             type={"pie"}
           />
+        </div>
+
+        <div className="rounded-md bg-white p-5 shadow-md">
+          <table className="min-w-full table-auto text-left text-sm text-gray-700">
+            <caption className="mb-5 text-2xl">
+              ตารางสินค้าขายดีที่สุด 5 อันดับ
+            </caption>
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border px-4 py-2">ชื่อสินค้า</th>
+                <th className="border px-4 py-2">หมวดหมู่</th>
+                <th className="border px-4 py-2">ขายได้</th>
+                <th className="border px-4 py-2">ยอดขายทั้งหมดของสินค้า</th>
+              </tr>
+            </thead>
+            <tbody>
+              {topSellingProducts.map((product, index) => (
+                <tr key={product.name} className="">
+                  <td className="border px-4 py-2">
+                    {index + 1}. {product.name}
+                  </td>
+                  <td className="border px-4 py-2">{product.category}</td>
+                  <td className="border px-4 py-2">{product.totalQuantity} คู่</td>
+                  <td className="border px-4 py-2">{product.totalRevenue.toLocaleString()} บาท</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
