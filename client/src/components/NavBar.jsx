@@ -137,7 +137,7 @@ function NavBar({ isAuthenticated, user, logout }) {
                   </DropdownMenuItem>
                   {user?.role === "admin" && (
                     <DropdownMenuItem asChild>
-                      <NavLink to="/admin" className="cursor-pointer">
+                      <NavLink to="/admin/dashboard" className="cursor-pointer">
                         แผงผู้ดูแล
                       </NavLink>
                     </DropdownMenuItem>
