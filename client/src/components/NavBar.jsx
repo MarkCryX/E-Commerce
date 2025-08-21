@@ -10,12 +10,16 @@ import {
 import { BsCart2 } from "react-icons/bs";
 import { toast } from "react-toastify";
 import { useCart } from "@/hooks/useCart";
+import { useState } from "react";
+import { FaSearch, FaAlignJustify } from "react-icons/fa";
+import { RxCross2 } from "react-icons/rx";
+import { IoIosArrowDown } from "react-icons/io";
 
 function NavBar({ isAuthenticated, user, logout }) {
   const { cart } = useCart();
-
   const itemcart = cart.reduce((total, item) => total + item.quantity, 0);
-
+  const [showSearch, setShowSearch] = useState(false);
+  const [openBurger, setOpenBurger] = useState(false);
   const handleLogout = async () => {
     const result = await logout(); // เรียกใช้ logout จาก AuthContext
     toast.success(result);
@@ -28,45 +32,111 @@ function NavBar({ isAuthenticated, user, logout }) {
 
   return (
     <nav className="py-3">
-      <div className="container mx-auto flex items-center gap-4 rounded-2xl bg-gray-300 px-4 py-3">
+      <div className="container mx-auto flex items-center justify-between gap-4 rounded-2xl bg-gray-300 px-4 py-3">
         {/* Left side: Logo + NavLinks */}
         <div className="flex items-center gap-4">
+          <div className="block md:hidden">
+            {openBurger ? (
+              <aside className="fixed top-0 left-0 z-99 h-full bg-gray-100 pt-10 pr-16 pl-8">
+                <RxCross2
+                  size={25}
+                  className="absolute top-4 right-4"
+                  onClick={() => setOpenBurger(false)}
+                />
+                <ul className="space-y-5 text-xl text-gray-700 mt-4">
+                  <li>
+                    <NavLink to="/" className={activeLink}>
+                      หน้าหลัก
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/product" className={activeLink}>
+                      สินค้า
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/about" className={activeLink}>
+                      เกี่ยวกับ
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/contact" className={activeLink}>
+                      ติดต่อ
+                    </NavLink>
+                  </li>
+                </ul>
+              </aside>
+            ) : (
+              <FaAlignJustify
+                size={20}
+                className="text-gray-600 cursor-pointer"
+                onClick={() => setOpenBurger(true)}
+              />
+            )}
+          </div>
+
           <h1 className="text-2xl font-extrabold text-gray-800">SHOPPER</h1>
           <ul className="hidden gap-x-6 text-gray-700 md:flex">
             <li>
               <NavLink to="/" className={activeLink}>
-                Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/about" className={activeLink}>
-                About
+                หน้าหลัก
               </NavLink>
             </li>
             <li>
               <NavLink to="/product" className={activeLink}>
-                Product
+                สินค้า
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/about" className={activeLink}>
+                เกี่ยวกับ
               </NavLink>
             </li>
             <li>
               <NavLink to="/contact" className={activeLink}>
-                Contact
+                ติดต่อ
               </NavLink>
             </li>
           </ul>
         </div>
 
-        {/* Center: Search */}
-        <div className="flex-1">
+        {/* ค้นหาสำหรับหน้าจอใหญ่กว่ามือถือ */}
+        <div className="hidden flex-1 md:block">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="ค้นหาสินค้า..."
             className="w-full rounded-full bg-gray-100 p-2 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
-        {/* Right side: User actions */}
+        {/* ค้นหาเต็มหน้าจอ (มือถือ)*/}
+        {showSearch && (
+          <div className="fixed inset-0 z-50 bg-white p-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                autoFocus
+                placeholder="ค้นหาสินค้า..."
+                className="flex-1 rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={() => setShowSearch(false)}
+                className="text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Right */}
         <div className="flex items-center gap-3">
+          {/* ปุ่มค้นหาสำหรับมือถือ*/}
+          <div className="mt-1 flex md:hidden">
+            <button onClick={() => setShowSearch(true)}>
+              <FaSearch size={20} className="text-gray-700" />
+            </button>
+          </div>
           {isAuthenticated ? (
             <>
               <Link to="/cart">
@@ -93,22 +163,9 @@ function NavBar({ isAuthenticated, user, logout }) {
                       className="h-8 w-8 rounded-full border-2 border-gray-400 object-fill"
                     />
                     <span className="hidden md:inline">
-                      {user?.username || "ผู้ใช้"}!
+                      {user?.username || "ผู้ใช้"}
                     </span>
-                    <svg
-                      className="h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                    <IoIosArrowDown />
                   </button>
                 </DropdownMenuTrigger>
 
