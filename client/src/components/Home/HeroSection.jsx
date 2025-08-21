@@ -31,12 +31,12 @@ const LandingBanner = () => {
             className="space-y-6"
           >
             <h1 className="mt-10 text-[70px] font-semibold sm:text-[80px] md:text-[85px] lg:text-[75px] xl:text-[95px]">
-              Find your <br /> dream snekers
+              รองเท้าที่ใช่<br/>สไตล์ของคุณ
             </h1>
           </motion.div>
           <TypewriterText
-            text="F ind your shoes from our various collections. Here shoes are endless, and profit is also endless."
-            className="text-md my-10 max-w-md text-gray-600 sm:text-lg"
+            text={`พ บกับรองเท้าหลากหลายสไตล์จากทุกคอลเลกชันที่เรามีให้คุณเลือกสรรไม่ว่าคุณจะมองหารองเท้าแบบไหนที่นี่มีให้ครบทุกความต้องการ พร้อมคุณค่าที่มากกว่าการสวมใส่`}
+            className="text-md my-10 max-w-md whitespace-pre-line text-gray-600 sm:text-lg"
           />
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -51,9 +51,9 @@ const LandingBanner = () => {
           >
             <Link
               to="/product"
-              className="mt-10 h-auto w-35 rounded-2xl bg-gray-700 p-2 text-center text-white hover:bg-gray-900"
+              className="mt-10 h-auto w-35 rounded-lg bg-gray-700 p-2 text-center text-white hover:bg-gray-900"
             >
-              Explore more
+              เลือกชมสินค้า
             </Link>
           </motion.div>
         </div>
