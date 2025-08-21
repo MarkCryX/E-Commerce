@@ -77,6 +77,28 @@ exports.getDashboardStats = async (req, res) => {
       return acc;
     }, {});
 
+    const productSales = {};
+
+    orders.forEach((order) => {
+      order.products.forEach((product) => {  
+        const key = product.name;
+        if (!productSales[key]) {
+          productSales[key] = {
+            name: product.name,
+            category: product.category,
+            totalQuantity: 0,
+            totalRevenue: 0,
+          };
+        }
+        productSales[key].totalQuantity += product.quantity;
+        productSales[key].totalRevenue += product.price * product.quantity;
+      });
+    });
+
+    const topSellingProducts = Object.values(productSales)
+      .sort((a, b) => b.totalQuantity - a.totalQuantity)
+      .slice(0, 5); // เอา Top 5
+
     const result = {
       summary: {
         totalOrders: totalOrders,
@@ -89,6 +111,7 @@ exports.getDashboardStats = async (req, res) => {
       ordersByDay,
       ordersByMonth,
       salesByCategory,
+      topSellingProducts,
     };
 
     return res.status(200).json(result);
