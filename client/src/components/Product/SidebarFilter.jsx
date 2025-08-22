@@ -36,9 +36,6 @@ const SidebarFilter = ({categories,show,setShow,handleCategoryChange,selectedCat
             </button>
           ))}
         </div>
-        <h2 className="mb-4 hidden text-xl font-bold lg:block">
-          เลือกซื้อตามราคา
-        </h2>
       </div>
     </div>
   );
