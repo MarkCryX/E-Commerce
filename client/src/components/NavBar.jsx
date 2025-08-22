@@ -54,16 +54,6 @@ function NavBar({ isAuthenticated, user, logout }) {
                       สินค้า
                     </NavLink>
                   </li>
-                  <li>
-                    <NavLink to="/about" className={activeLink}>
-                      เกี่ยวกับ
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink to="/contact" className={activeLink}>
-                      ติดต่อ
-                    </NavLink>
-                  </li>
                 </ul>
               </aside>
             ) : (
@@ -85,16 +75,6 @@ function NavBar({ isAuthenticated, user, logout }) {
             <li>
               <NavLink to="/product" className={activeLink}>
                 สินค้า
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/about" className={activeLink}>
-                เกี่ยวกับ
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/contact" className={activeLink}>
-                ติดต่อ
               </NavLink>
             </li>
           </ul>
