@@ -33,12 +33,9 @@ export const uploadImageToCloudinary = async (file) => {
 
 export const deleteImageFromCloudinary = async (publicId) => {
   try {
-    const response = await axios.post(
+    const response = await axios.delete(
       `${API_BASE}/api/remove-image`, // URL ของ Backend API สำหรับลบรูปภาพ
-      { public_id: publicId }, // ส่ง public_id ไปใน body ของ request
-      {
-        withCredentials: true,
-      },
+      { data: { public_id: publicId }, withCredentials: true }, // ส่ง public_id ไปใน body ของ request
     );
     return response.data; // Backend จะคืนค่า { message, public_id }
   } catch (error) {
