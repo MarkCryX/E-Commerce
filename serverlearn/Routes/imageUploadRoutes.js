@@ -16,6 +16,6 @@ router.post(
   createImages
 );
 
-router.post("/remove-image", authCheck, isAdmin, removeImage);
+router.delete("/remove-image", authCheck, isAdmin, removeImage);
 
 module.exports = router;
