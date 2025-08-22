@@ -13,15 +13,7 @@ const { body, param } = require("express-validator");
 const router = express.Router();
 const { addressValidationRules } = require("../validations/addressValidation");
 
-
-router.get("/users", authCheck, isAdmin, getAllUsers);
-
-router.get(
-  "/users/:id",
-  [param("id").isMongoId().withMessage("ID ผู้ใช้ไม่ถูกต้อง")],
-  authCheck,
-  getUserById
-);
+// --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 
 router.post(
   "/users/me/address",
@@ -45,6 +37,23 @@ router.put(
   updateisDefaultAddress
 );
 
-router.delete("/users/me/address/:addressId", authCheck, deleteAddress);
+router.delete(
+  "/users/me/address/:addressId",
+  [param("addressId").isMongoId().withMessage("addressId ไม่ถูกต้อง")],
+  authCheck,
+  deleteAddress
+);
+
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
+
+router.get("/users", authCheck, isAdmin, getAllUsers);
+
+router.get(
+  "/users/:id",
+  [param("id").isMongoId().withMessage("ID ผู้ใช้ไม่ถูกต้อง")],
+  authCheck,
+  isAdmin,
+  getUserById
+);
 
 module.exports = router;
