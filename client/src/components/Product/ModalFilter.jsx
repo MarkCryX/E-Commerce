@@ -33,46 +33,55 @@ const ModalFilter = ({
           <h2 className="mb-2 text-xl font-bold">เรียงตาม</h2>
 
           <div className="inline-block">
-            <div
-              className="flex items-center"
-              onClick={() => handleSortAndClose("createdAt_desc")}
-            >
+            <div className="flex items-center">
               <input
                 type="radio"
                 name="sort-by"
                 value="createdAt_desc"
                 checked={sortBy === "createdAt_desc"}
+                onChange={() => handleSortAndClose("createdAt_desc")}
                 className="form-radio h-5 w-5 cursor-pointer text-blue-600"
               />
-              <label className="cursor-pointer p-3">ใหม่ล่าสุด</label>
+              <label
+                className="cursor-pointer p-3"
+                onClick={() => handleSortAndClose("createdAt_desc")}
+              >
+                ใหม่ล่าสุด
+              </label>
             </div>
 
-            <div
-              className="flex items-center"
-              onClick={() => handleSortAndClose("price_desc")}
-            >
+            <div className="flex items-center">
               <input
                 type="radio"
                 name="sort-by"
                 value="price_desc"
                 checked={sortBy === "price_desc"}
+                onChange={() => handleSortAndClose("price_desc")}
                 className="form-radio h-5 w-5 cursor-pointer text-blue-600"
               />
-              <label className="cursor-pointer p-3">ราคา: สูง-ต่ำ</label>
+              <label
+                className="cursor-pointer p-3"
+                onClick={() => handleSortAndClose("price_desc")}
+              >
+                ราคา: สูง-ต่ำ
+              </label>
             </div>
 
-            <div
-              className="flex items-center"
-              onClick={() => handleSortAndClose("price_asc")}
-            >
+            <div className="flex items-center">
               <input
                 type="radio"
                 name="sort-by"
                 value="price_asc"
                 checked={sortBy === "price_asc"}
+                onChange={() => handleSortAndClose("price_asc")}
                 className="form-radio h-5 w-5 cursor-pointer text-blue-600"
               />
-              <label className="cursor-pointer p-3">ราคา: ต่ำ-สูง</label>
+              <label
+                className="cursor-pointer p-3"
+                onClick={() => handleSortAndClose("price_asc")}
+              >
+                ราคา: ต่ำ-สูง
+              </label>
             </div>
           </div>
         </div>
@@ -81,19 +90,21 @@ const ModalFilter = ({
         <div className="border-b-1 py-3">
           <h2 className="mb-4 text-xl font-bold">หมวดหมู่</h2>
           {categories.map((cat) => (
-            <div
-              className="flex flex-col space-y-2"
-              onClick={() => handleCategoryAndClose(cat._id)}
-            >
+            <div key={cat._id} className="flex flex-col space-y-2">
               <div className="flex items-center">
                 <input
                   type="radio"
                   name="category"
                   value={cat._id}
                   checked={selectedCategory === cat._id}
+                  onChange={() => handleCategoryAndClose(cat._id)}
                   className="form-radio h-5 w-5 cursor-pointer text-blue-600"
                 />
-                <label key={cat._id} className="cursor-pointer p-3">
+                <label
+                  key={cat._id}
+                  className="cursor-pointer p-3"
+                  onClick={() => handleCategoryAndClose(cat._id)}
+                >
                   {cat.name}
                 </label>
               </div>
