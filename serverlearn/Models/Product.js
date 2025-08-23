@@ -31,22 +31,22 @@ const productSchema = mongoose.Schema(
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category' ,
+      ref: "Category",
       required: true,
     },
     images: {
-      type: [{
-          // <--- เปลี่ยนตรงนี้
+      type: [
+        {
           public_id: {
             type: String,
-            required: true, // ควรบังคับให้มี public_id
+            required: true,
           },
           url: {
             type: String,
-            required: true, // ควรบังคับให้มี url
+            required: true,
           },
-        },],
-      default: [],
+        },
+      ],
     },
   },
   { timestamps: true }
