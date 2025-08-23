@@ -46,10 +46,10 @@ router.delete(
 
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 
-router.get("/users", authCheck, isAdmin, getAllUsers);
+router.get("/admin/users", authCheck, isAdmin, getAllUsers);
 
 router.get(
-  "/users/:id",
+  "/admin/users/:id",
   [param("id").isMongoId().withMessage("ID ผู้ใช้ไม่ถูกต้อง")],
   authCheck,
   isAdmin,

@@ -7,15 +7,15 @@ const upload = require("../Middleware/upload");
 
 const router = express.Router();
 
-// Endpoint สำหรับการอัปโหลดรูปภาพ
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 router.post(
-  "/upload-images",
+  "/admin/upload-images",
   upload.array("images", 10),
   authCheck,
   isAdmin,
   createImages
 );
 
-router.delete("/remove-image", authCheck, isAdmin, removeImage);
+router.delete("/admin/remove-image", authCheck, isAdmin, removeImage);
 
 module.exports = router;

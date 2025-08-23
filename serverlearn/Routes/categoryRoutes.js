@@ -15,6 +15,9 @@ const {
 
 const router = express.Router();
 
+
+// --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
+
 router.get("/category", readCategory);
 
 router.get(
@@ -23,8 +26,10 @@ router.get(
   readCategoryById
 );
 
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
+
 router.post(
-  "/category",
+  "/admin/category",
   categoryValidationRules,
   authCheck,
   isAdmin,
@@ -32,7 +37,7 @@ router.post(
 );
 
 router.put(
-  "/category/:id",
+  "/admin/category/:id",
   [param("id").isMongoId().withMessage("ID หมวดหมู่ไม่ถูกต้อง")],
   categoryValidationRules,
   authCheck,
@@ -41,7 +46,7 @@ router.put(
 );
 
 router.delete(
-  "/category/:id",
+  "/admin/category/:id",
   [param("id").isMongoId().withMessage("ID หมวดหมู่ไม่ถูกต้อง")],
   authCheck,
   isAdmin,

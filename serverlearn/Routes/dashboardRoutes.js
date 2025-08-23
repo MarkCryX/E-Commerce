@@ -3,8 +3,8 @@ const router = express.Router();
 const { getDashboardStats } = require("../Controllers/dashboardController");
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
 
-
-router.get("/dashboard/stats/summary", authCheck, isAdmin, getDashboardStats)
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
+router.get("/admin/dashboard/stats/summary", authCheck, isAdmin, getDashboardStats)
 
 
 module.exports = router;

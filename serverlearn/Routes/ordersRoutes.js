@@ -35,10 +35,10 @@ router.patch(
 
 
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
-router.get("/orders", authCheck, isAdmin, getOrdersAdmin);
+router.get("/admin/orders", authCheck, isAdmin, getOrdersAdmin);
 
 router.patch(
-  "/orders/:id/status",
+  "/admin/orders/:id/status",
   [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
   authCheck,
   isAdmin,
@@ -46,7 +46,7 @@ router.patch(
 );
 
 router.patch(
-  "/orders/:id/payment-status",
+  "/admin/orders/:id/payment-status",
   [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
   authCheck,
   isAdmin,
@@ -54,7 +54,7 @@ router.patch(
 );
 
 router.patch(
-  "/orders/:id/complete",
+  "/admin/orders/:id/complete",
   [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
   authCheck,
   isAdmin,
