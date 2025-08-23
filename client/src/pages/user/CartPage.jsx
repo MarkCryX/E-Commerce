@@ -15,7 +15,6 @@ const CartPage = () => {
   const {
     cart,
     removeFromCart,
-    addToCart,
     clearCart,
     handleIncrease,
     handleDecrease,
@@ -46,14 +45,9 @@ const CartPage = () => {
         return;
       }
 
-     
-      
       const orderData = {
         products: cart.map((item) => ({
           product: item.product,
-          category:item.category,
-          name: item.name,
-          price: item.price,
           quantity: item.quantity,
           size: item.size,
           color: item.color,
@@ -62,7 +56,7 @@ const CartPage = () => {
         shippingAddress: currentAddress,
         payment: paymentMethod,
       };
-      
+
       const response = await createOrder(orderData);
       clearCart();
       toast.success("สั่งซื้อสินค้าสำเร็จ");
