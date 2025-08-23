@@ -1,13 +1,13 @@
 import axios from "axios";
 
-const API_BASE = `${import.meta.env.VITE_BACK_END_URL}/api/dashboard/stats`;
+const API_BASE_ADMIN = `${import.meta.env.VITE_BACK_END_URL}/api/admin/dashboard/stats`;
 
 
 
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 export const getDashboardStats = async () => {
   try {
-    const response = await axios.get(`${API_BASE}/summary`, {
+    const response = await axios.get(`${API_BASE_ADMIN}/summary`, {
       withCredentials: true,
     });
     return response.data;

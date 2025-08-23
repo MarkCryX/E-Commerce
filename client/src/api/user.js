@@ -1,6 +1,10 @@
 import axios from "axios";
 
 const API_BASE = `${import.meta.env.VITE_BACK_END_URL}/api/users/me/address`;
+const API_BASE_ADMIN = `${import.meta.env.VITE_BACK_END_URL}/api/admin/users`;
+
+
+// --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 
 export const createAddress = async (formData) => {
   try {
@@ -78,3 +82,5 @@ export const deleteAddress = async (addressId) => {
     throw new Error(msg);
   }
 };
+
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---

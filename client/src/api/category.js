@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const API_BASE = `${import.meta.env.VITE_BACK_END_URL}/api/category`;
+const API_BASE_ADMIN = `${import.meta.env.VITE_BACK_END_URL}/api/admin/category`
 
+
+// --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 export const fetchCategory = async () => {
   try {
     const response = await axios.get(API_BASE);
@@ -36,9 +39,10 @@ export const fetchCategoryById = async (id) => {
   }
 };
 
+// --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 export const createCategory = async (formcategory) => {
   try {
-    const response = await axios.post(API_BASE, formcategory, {
+    const response = await axios.post(API_BASE_ADMIN, formcategory, {
       withCredentials: true,
     });
     return response.data.message || "สร้างหมวดหมู่สำเร็จ";
@@ -55,7 +59,7 @@ export const createCategory = async (formcategory) => {
 
 export const updateCategory = async (id, formcategory) => {
   try {
-    const response = await axios.put(`${API_BASE}/${id}`, formcategory, {
+    const response = await axios.put(`${API_BASE_ADMIN}/${id}`, formcategory, {
       withCredentials: true,
     });
 
@@ -73,7 +77,7 @@ export const updateCategory = async (id, formcategory) => {
 
 export const deleteCategory = async (id) => {
   try {
-    const response = await axios.delete(`${API_BASE}/${id}`, {
+    const response = await axios.delete(`${API_BASE_ADMIN}/${id}`, {
       withCredentials: true,
     });
 

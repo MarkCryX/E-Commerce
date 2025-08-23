@@ -1,6 +1,8 @@
 import axios from "axios";
 
 const API_BASE = `${import.meta.env.VITE_BACK_END_URL}/api/orders`;
+const API_BASE_ADMIN = `${import.meta.env.VITE_BACK_END_URL}/api/admin/orders`;
+
 
 // --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 export const createOrder = async (orderData) => {
@@ -60,7 +62,7 @@ export const uploadPaymentSlip = async (id, slipUrl) => {
 // --- Admin Endpoints (สำหรับผู้ดูแลระบบ) ---
 export const fetchOrdersAdmin = async () => {
   try {
-    const response = await axios.get(API_BASE, {
+    const response = await axios.get(API_BASE_ADMIN, {
       withCredentials: true,
     });
 
@@ -80,7 +82,7 @@ export const fetchOrdersAdmin = async () => {
 export const updateStatusOrder = async (id, status) => {
   try {
     const response = await axios.patch(
-      `${API_BASE}/${id}/status`,
+      `${API_BASE_ADMIN}/${id}/status`,
       { status },
       {
         withCredentials: true,
@@ -101,7 +103,7 @@ export const updateStatusOrder = async (id, status) => {
 
 export const genQRCodeForOrder = async (id) => {
   try {
-    const response = await axios.get(`${API_BASE}/qrcode/${id}`, {
+    const response = await axios.get(`${API_BASE_ADMIN}/qrcode/${id}`, {
       withCredentials: true,
     });
     return response.data;
@@ -121,7 +123,7 @@ export const genQRCodeForOrder = async (id) => {
 export const updatePaymemtStatus = async (id, paymentstatus) => {
   try {
     const response = await axios.patch(
-      `${API_BASE}/${id}/payment-status`,
+      `${API_BASE_ADMIN}/${id}/payment-status`,
       { paymentstatus },
       {
         withCredentials: true,
@@ -143,7 +145,7 @@ export const updatePaymemtStatus = async (id, paymentstatus) => {
 export const closeOrder = async (id) => {
   try {
     const response = await axios.patch(
-      `${API_BASE}/${id}/complete`,
+      `${API_BASE_ADMIN}/${id}/complete`,
       {},
       {
         withCredentials: true,
