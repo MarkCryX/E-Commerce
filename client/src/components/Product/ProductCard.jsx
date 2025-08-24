@@ -1,6 +1,17 @@
 import { Link } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
+  
+  if (!product) {
+    return (
+      <div className="h-full">
+        <div className="h-full w-full rounded-sm bg-gray-100 p-4">
+          <p className="text-gray-500">สินค้าไม่พร้อมแสดง</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full">
       <Link to={`/product/${product._id}`}>
@@ -8,7 +19,7 @@ const ProductCard = ({ product }) => {
           {product.images?.[0]?.url ? (
             <img
               src={product.images[0].url}
-              alt=""
+              alt="รูปสินค้า"
               className="mb-2 h-64 w-full rounded-t-lg object-cover"
             />
           ) : (
@@ -21,10 +32,14 @@ const ProductCard = ({ product }) => {
             <h2 className="truncate text-base font-semibold text-gray-800">
               {product.name || "ไม่มีชื่อสินค้า"}
             </h2>
-            <p className="text-sm text-gray-500">{product.category.name || "ไม่มีหมวดหมู่"}</p>
-            <p className="text-sm text-gray-500">{product.colors.length || 0} สี</p>
+            <p className="text-sm text-gray-500">
+              {product.category?.name || "ไม่มีหมวดหมู่"}
+            </p>
+            <p className="text-sm text-gray-500">
+              {product.colors?.length || 0} สี
+            </p>
             <p className="text-sm font-semibold text-gray-600">
-              ฿{product.price.toLocaleString() || "N/A"}
+              ฿{product.price?.toLocaleString() || "N/A"}
             </p>
           </div>
         </div>
