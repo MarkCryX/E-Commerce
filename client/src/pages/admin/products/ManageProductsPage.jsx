@@ -68,7 +68,7 @@ const ManageProductsPage = () => {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">กำลังโหลดสินค้า...</p>
+        <p className="text-gray-500 text-center">กำลังโหลดสินค้า...</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : products.length === 0 ? (
@@ -88,25 +88,25 @@ const ManageProductsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map((product, idx) => (
-                <tr key={product._id} className="hover:bg-gray-50">
-                  <td className="border px-4 py-2">{idx + 1}</td>
+              {products.map((product, index) => (
+                <tr key={product._id || index} className="hover:bg-gray-50">
+                  <td className="border px-4 py-2">{index + 1}</td>
                   <td className="border px-4 py-2">{product._id}</td>
-                  <td className="border px-4 py-2">{product.name}</td>
-                  <td className="border px-4 py-2">{product.quantity} ชิ้น</td>
+                  <td className="border px-4 py-2">{product.name || "ไม่มีชื่อสินค้า"}</td>
+                  <td className="border px-4 py-2">{product.quantity ?? 0} ชิ้น</td>
                   <td className="border px-4 py-2">
-                    {product.price.toLocaleString()} บาท
+                    {product.price?.toLocaleString() || "N/A"} บาท
                   </td>
-                  <td className="border px-4 py-2">{product.category.name}</td>
+                  <td className="border px-4 py-2">{product.category?.name || "ไม่มีหมวดหมู่"}</td>
                   <td className="flex justify-center gap-10 border px-4 py-2">
                     <Link
-                      to={`/admin/edit-product/${product._id}`}
+                      to={`/admin/edit-product/${product._id || ""}`}
                       className="rounded bg-yellow-400 px-3 py-1 text-white hover:bg-yellow-500"
                     >
                       แก้ไข
                     </Link>
                     <button
-                      onClick={() => handleDelete(product._id, product.name)}
+                      onClick={() => handleDelete(product._id || "", product.name || "")}
                       className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
                     >
                       ลบ
