@@ -4,7 +4,6 @@ import { fetchCategory } from "@/api/category";
 import ProductCard from "@/components/Product/ProductCard";
 import { FaFilter } from "react-icons/fa";
 import ModalFilter from "@/components/Product/ModalFilter";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import SidebarFilter from "@/components/Product/SidebarFilter";
 import { toast } from "react-toastify";
 import { extractErrorMessage } from "@/utils/errorHelper";
@@ -57,7 +56,7 @@ const ProductPage = () => {
     const loadCategories = async () => {
       try {
         const response = await fetchCategory(); // เรียกใช้ API ดึงหมวดหมู่ทั้งหมด
-        setCategories(response);
+        setCategories(response || []);
       } catch (error) {
         const message = extractErrorMessage(error);
         console.error("ไม่สามารถดึงข้อมูลหมวดหมู่ได้", error);
@@ -73,25 +72,22 @@ const ProductPage = () => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetchProducts(
-          page,
-          20,
-          sortBy,
-          selectedCategory,
-        );
-        if (
-          response.products.length === 0 ||
-          response.page >= response.totalPages
-        ) {
-          setHasMore(false);
+        const response = await fetchProducts(page,20,sortBy,selectedCategory);
+
+        const fetchedProducts = response?.products || [];
+         
+        if (fetchedProducts.length === 0 || response?.page >= response?.totalPages) {
+        setHasMore(false);
         }
+
         setProducts((prev) => {
-          // กรองสินค้าที่ซ้ำกันก่อนเพิ่ม (ป้องกันกรณี IntersectionObserver ทำงานซ้ำ)
-          const newProducts = response.products.filter(
-            (p) => !prev.some((old) => old._id === p._id),
-          );
-          return [...prev, ...newProducts];
+        // กรองสินค้าที่ซ้ำกันและไม่เป็น null ก่อนเพิ่ม
+        const newProducts = fetchedProducts.filter(
+          (p) => p && !prev.some((old) => old._id === p._id)
+        );
+        return [...prev, ...newProducts];
         });
+
       } catch (error) {
         const message = extractErrorMessage(error);
         setError(message);
@@ -140,7 +136,7 @@ const ProductPage = () => {
 
       <div className="flex flex-col lg:grid lg:grid-cols-[1fr_5fr]">
         <SidebarFilter
-          categories={categories}
+          categories={categories || []}
           show={show}
           setShow={setShow}
           handleCategoryChange={handleCategoryChange}
