@@ -44,6 +44,17 @@ const ManageProductsPage = () => {
     }
   };
 
+  
+  if (!products) {
+    return (
+      <div className="h-full">
+        <div className="h-full w-full rounded-sm bg-gray-100 p-4">
+          <p className="text-gray-500">สินค้าไม่พร้อมแสดง</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="ml-3 rounded-lg bg-white p-6 shadow-md">
       <div className="mb-4 flex items-center justify-between">
