@@ -15,7 +15,7 @@ import { FaSearch, FaAlignJustify } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
 import { IoIosArrowDown } from "react-icons/io";
 
-function NavBar({ isAuthenticated, user, logout }) {
+function Navbar({ isAuthenticated, user, logout }) {
   const { cart } = useCart();
   const itemcart = cart.reduce((total, item) => total + item.quantity, 0);
   const [showSearch, setShowSearch] = useState(false);
@@ -211,4 +211,4 @@ function NavBar({ isAuthenticated, user, logout }) {
   );
 }
 
-export default NavBar;
+export default Navbar;
