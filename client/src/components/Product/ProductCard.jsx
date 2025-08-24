@@ -19,12 +19,12 @@ const ProductCard = ({ product }) => {
 
           <div className="flex flex-col gap-1 px-3 pb-3">
             <h2 className="truncate text-base font-semibold text-gray-800">
-              {product.name}
+              {product.name || "ไม่มีชื่อสินค้า"}
             </h2>
-            <p className="text-sm text-gray-500">{product.category.name}</p>
-            <p className="text-sm text-gray-500">{product.colors.length} สี</p>
+            <p className="text-sm text-gray-500">{product.category.name || "ไม่มีหมวดหมู่"}</p>
+            <p className="text-sm text-gray-500">{product.colors.length || 0} สี</p>
             <p className="text-sm font-semibold text-gray-600">
-              ฿{product.price.toLocaleString()}
+              ฿{product.price.toLocaleString() || "N/A"}
             </p>
           </div>
         </div>
