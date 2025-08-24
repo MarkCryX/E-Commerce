@@ -79,7 +79,7 @@ exports.login = async (req, res) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // ส่งผ่าน HTTPS เท่านั้นใน production
-      sameSite: "Lax", // ป้องกัน CSRF
+      sameSite: process.env.COOKIE_SAMESITE || "Lax", // ป้องกัน CSRF
       maxAge: 15 * 60 * 1000, // อายุ 15 นาที
       path: "/",
     });
@@ -87,7 +87,7 @@ exports.login = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // ส่งผ่าน HTTPS เท่านั้นใน production
-      sameSite: "Lax", // ป้องกัน CSRF
+      sameSite: process.env.COOKIE_SAMESITE || "Lax", // ป้องกัน CSRF
       maxAge: 7 * 24 * 60 * 60 * 1000, // อายุ 7 วัน
       path: "/",
     });
@@ -137,7 +137,7 @@ exports.refreshAccessToken = async (req, res) => {
       res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
+        sameSite: process.env.COOKIE_SAMESITE || "Lax",
         path: "/",
       });
 
@@ -167,14 +167,14 @@ exports.refreshAccessToken = async (req, res) => {
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: process.env.COOKIE_SAMESITE || "Lax",
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: process.env.COOKIE_SAMESITE || "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -190,7 +190,7 @@ exports.refreshAccessToken = async (req, res) => {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: process.env.COOKIE_SAMESITE || "Lax",
       path: "/",
     });
 
@@ -262,14 +262,14 @@ exports.logout = async (req, res) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "Lax",
+    sameSite: process.env.COOKIE_SAMESITE || "Lax",
     path: "/",
   });
 
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "Lax",
+    sameSite: process.env.COOKIE_SAMESITE || "Lax",
     path: "/",
   });
 
