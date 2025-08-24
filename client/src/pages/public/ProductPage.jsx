@@ -72,22 +72,29 @@ const ProductPage = () => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetchProducts(page,20,sortBy,selectedCategory);
+        const response = await fetchProducts(
+          page,
+          20,
+          sortBy,
+          selectedCategory,
+        );
 
         const fetchedProducts = response?.products || [];
-         
-        if (fetchedProducts.length === 0 || response?.page >= response?.totalPages) {
-        setHasMore(false);
+
+        if (
+          fetchedProducts.length === 0 ||
+          response?.page >= response?.totalPages
+        ) {
+          setHasMore(false);
         }
 
         setProducts((prev) => {
-        // กรองสินค้าที่ซ้ำกันและไม่เป็น null ก่อนเพิ่ม
-        const newProducts = fetchedProducts.filter(
-          (p) => p && !prev.some((old) => old._id === p._id)
-        );
-        return [...prev, ...newProducts];
+          // กรองสินค้าที่ซ้ำกันและไม่เป็น null ก่อนเพิ่ม
+          const newProducts = fetchedProducts.filter(
+            (p) => p && !prev.some((old) => old._id === p._id),
+          );
+          return [...prev, ...newProducts];
         });
-
       } catch (error) {
         const message = extractErrorMessage(error);
         setError(message);
@@ -144,17 +151,26 @@ const ProductPage = () => {
         />
 
         <div className="grid grid-cols-2 gap-5 px-5 pb-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.map((product, index) => {
-            if (products.length === index + 1) {
-              return (
-                <div ref={lastProductRef} key={product._id}>
-                  <ProductCard product={product} />
-                </div>
-              );
-            } else {
-              return <ProductCard key={product._id} product={product} />;
-            }
-          })}
+          {products.length === 0 ? (
+            <p className="py-4 text-center text-gray-500">ไม่มีสินค้า</p>
+          ) : (
+            products.map((product, index) => {
+              // ถ้าไม่มี products ส่ง null ออกไป
+              if (!product) return null;
+
+              if (products.length === index + 1) {
+                return (
+                  <div ref={lastProductRef} key={product._id || index}>
+                    <ProductCard product={product} />
+                  </div>
+                );
+              } else {
+                return (
+                  <ProductCard key={product._id || index} product={product} />
+                );
+              }
+            })
+          )}
         </div>
       </div>
 
