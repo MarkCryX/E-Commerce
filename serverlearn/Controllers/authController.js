@@ -3,6 +3,8 @@ const User = require("../Models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const isProd = process.env.NODE_ENV === "production";
+
 exports.register = async (req, res) => {
   const errors = validationResult(req);
 
@@ -78,16 +80,16 @@ exports.login = async (req, res) => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ส่งผ่าน HTTPS เท่านั้นใน production
-      sameSite: process.env.COOKIE_SAMESITE || "Lax", // ป้องกัน CSRF
+      secure: isProd, // ส่งผ่าน HTTPS เท่านั้นใน production
+      sameSite: isProd ? "None" : "Lax", // ป้องกัน CSRF
       maxAge: 15 * 60 * 1000, // อายุ 15 นาที
       path: "/",
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ส่งผ่าน HTTPS เท่านั้นใน production
-      sameSite: process.env.COOKIE_SAMESITE || "Lax", // ป้องกัน CSRF
+      secure: isProd, 
+      sameSite: isProd ? "None" : "Lax", 
       maxAge: 7 * 24 * 60 * 60 * 1000, // อายุ 7 วัน
       path: "/",
     });
@@ -100,7 +102,6 @@ exports.login = async (req, res) => {
       profileImage: user.profileImage,
       addresses: user.addresses,
       orders: user.orders,
-      // เพิ่ม field อื่นๆ ที่คุณต้องการส่งกลับไปด้วย เช่น cart, orders (ถ้าต้องการ)
     };
 
     res
@@ -136,8 +137,8 @@ exports.refreshAccessToken = async (req, res) => {
       // ลบ Cookie ที่ไม่ถูกต้อง
       res.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.COOKIE_SAMESITE || "Lax",
+        secure: isProd, 
+        sameSite: isProd ? "None" : "Lax", 
         path: "/",
       });
 
@@ -166,15 +167,15 @@ exports.refreshAccessToken = async (req, res) => {
     // 6. ตั้งค่า Cookie ใหม่
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.COOKIE_SAMESITE || "Lax",
+      secure: isProd, 
+      sameSite: isProd ? "None" : "Lax", 
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.COOKIE_SAMESITE || "Lax",
+      secure: isProd, 
+      sameSite: isProd ? "None" : "Lax", 
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -189,8 +190,8 @@ exports.refreshAccessToken = async (req, res) => {
     // 8. ลบ Cookie ที่หมดอายุหรือไม่ถูกต้อง
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.COOKIE_SAMESITE || "Lax",
+      secure: isProd, 
+      sameSite: isProd ? "None" : "Lax", 
       path: "/",
     });
 
@@ -247,7 +248,7 @@ exports.logout = async (req, res) => {
       const user = await User.findOne({ refreshToken });
 
       if (user) {
-        // ลบเฉพาะ Token ที่ใช้ล็อกเอาท์
+        // ลบเฉพาะ refreshToken 
         await User.findByIdAndUpdate(user._id, {
           $unset: { refreshToken: "" },
         });
@@ -261,15 +262,15 @@ exports.logout = async (req, res) => {
 
   res.clearCookie("accessToken", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.COOKIE_SAMESITE || "Lax",
+    secure: isProd, 
+    sameSite: isProd ? "None" : "Lax", 
     path: "/",
   });
 
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.COOKIE_SAMESITE || "Lax",
+    secure: isProd, 
+    sameSite: isProd ? "None" : "Lax", 
     path: "/",
   });
 
