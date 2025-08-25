@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
 import { extractErrorMessage } from "@/utils/errorHelper";
+import { Register } from "../api/auth";
+import { FaSpinner } from "react-icons/fa";
+
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -12,7 +15,7 @@ const RegisterPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [isloading, setIsLoading] = useState(false);
-  const { login, isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,26 +31,20 @@ const RegisterPage = () => {
 
     try {
       setIsLoading(true);
-      // await new Promise((resolve) => setTimeout(resolve, 10000));
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACK_END_URL}/api/auth/register`,
-        userData,
-      );
-
-      if (response.status !== 201) {
-        toast.error("สมัครสมาชิกไม่สำเร็จ");
-      }
-
+      const response = await Register(userData);
       setUsername("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
-      toast.success("สมัครสมาชิกสำเร็จ");
+      toast.success(response.message);
       navigate("/login");
     } catch (error) {
-      console.error("เกิดข้อผิดพลาดระหว่างการสมัครสมาชิก", error);
-      const errors = error?.response?.data?.errors;
-      setError(errors);
+      if (Array.isArray(error?.errors)) {
+        setError(error.errors);
+      } else {
+        const message = extractErrorMessage(error);
+        toast.error(message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -78,10 +75,15 @@ const RegisterPage = () => {
             value={username}
             maxLength={30}
             minLength={3}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {
+              setUsername(e.target.value);
+              setError((prev) =>
+                prev ? prev.filter((item) => item.path !== "username") : null,
+              );
+            }}
             autoComplete="username"
           />
-          {error &&
+          {Array.isArray(error) &&
             error
               .filter((item) => item.path === "username")
               .map((item, index) => (
@@ -108,14 +110,13 @@ const RegisterPage = () => {
             }}
             autoComplete="email"
           />
-          {error &&
-            error
-              .filter((item) => item.path === "email")
-              .map((item, index) => (
-                <p key={index} className="text-sm text-red-500">
-                  *{item.msg}
-                </p>
-              ))}
+          {error
+            ?.filter((item) => item.path === "email")
+            .map((item, index) => (
+              <p key={index} className="text-sm text-red-500">
+                *{item.msg}
+              </p>
+            ))}
         </div>
         <div className="mx-auto mt-6 max-w-md">
           <label htmlFor="password">
@@ -137,14 +138,13 @@ const RegisterPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="password"
           />
-          {error &&
-            error
-              .filter((item) => item.path === "password")
-              .map((item, index) => (
-                <p key={index} className="text-sm text-red-500">
-                  *{item.msg}
-                </p>
-              ))}
+          {error
+            ?.filter((item) => item.path === "password")
+            .map((item, index) => (
+              <p key={index} className="text-sm text-red-500">
+                *{item.msg}
+              </p>
+            ))}
         </div>
         <div className="mx-auto mt-6 max-w-md">
           <label htmlFor="confirmPassword">confirm password</label>
@@ -171,27 +171,8 @@ const RegisterPage = () => {
             disabled={isloading}
           >
             {isloading ? (
-              <div className="flex gap-2">
-                <svg
-                  className="mx-auto h-5 w-5 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  ></path>
-                </svg>
+              <div className="flex items-center justify-center gap-2">
+                <FaSpinner className="animate-spin text-white" />
                 <span>กำลังสมัครสมาชิก</span>
               </div>
             ) : (
