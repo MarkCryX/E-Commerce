@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "react-toastify";
-import { extractErrorMessage } from "@/utils/errorHelper";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -14,21 +13,17 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalLoading(true);
-    try {
-      // await new Promise((resolve) => setTimeout(resolve, 50000));
-      const response = await login(email, password);
-      if (response.success) {
-        toast.success(response.message);
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      const message = extractErrorMessage(error);
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLocalLoading(false);
+
+    // await new Promise((resolve) => setTimeout(resolve, 50000));
+    const response = await login(email, password);
+    
+    if (response.success) {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
     }
+
+    setLocalLoading(false);
   };
 
   return (

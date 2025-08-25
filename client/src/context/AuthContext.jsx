@@ -2,6 +2,8 @@
 import { createContext, useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Login } from "../api/auth";
+import { extractErrorMessage } from "@/utils/errorHelper";
 
 export const AuthContext = createContext(null);
 
@@ -233,39 +235,27 @@ export const AuthProvider = ({ children }) => {
   // ฟังก์ชันสำหรับ login
   const login = async (email, password) => {
     setLoading(true);
-
     try {
       // 1. ส่งคำขอ Login ไปยัง Backend
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACK_END_URL}/api/auth/login`,
-        { email, password },
-        { withCredentials: true }, // ส่ง cookie ไปด้วย
-      );
+      const response = await Login(email, password);
+      setIsAuthenticated(true);
+      setUser(response.user);
+      setHasRefreshTokenFailed(false);
+      setHasLoggedOut(false);
+      setLoading(false);
 
-      // 2. ตรวจสอบการตอบกลับ
-      if (response.status === 200 && response.data.user) {
-        // 2.1. ถ้า Login สำเร็จ
-        setIsAuthenticated(true);
-        setUser(response.data.user);
-        setHasRefreshTokenFailed(false);
-        setHasLoggedOut(false);
-        setLoading(false);
-
-        return {
-          success: true,
-          message: response.data.message,
-          user: response.data.user,
-        };
-      }
+      return {
+        success: true,
+        message: response.message,
+      };
     } catch (error) {
-      // 3. จัดการข้อผิดพลาดในการ Login
-      console.error("เกิดข้อผิดพลาดในการล็อกอิน", error);
       setIsAuthenticated(false);
       setUser(null);
       setLoading(false);
+
       return {
         success: false,
-        message: error.response?.data?.message || "เกิดข้อผิดพลาดในการล็อกอิน",
+        message: extractErrorMessage(error),
       };
     }
   };
@@ -290,7 +280,7 @@ export const AuthProvider = ({ children }) => {
         { withCredentials: true },
       );
 
-      return response.data.message
+      return response.data.message;
     } catch (error) {
       // 7. จัดการข้อผิดพลาดในการ Logout
       console.error("เกิดข้อผิดพลาดในการล็อกเอาท์", error);
@@ -318,4 +308,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
