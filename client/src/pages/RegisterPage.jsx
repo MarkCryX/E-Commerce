@@ -135,7 +135,12 @@ const RegisterPage = () => {
             required
             minLength={3}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError((prev) =>
+                prev ? prev.filter((item) => item.path !== "password") : null,
+              );
+            }}
             autoComplete="password"
           />
           {error
