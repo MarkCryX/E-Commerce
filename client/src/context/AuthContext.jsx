@@ -2,7 +2,13 @@
 import { createContext, useState, useEffect, useContext, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Login } from "../api/auth";
+import {
+  HasToken,
+  Login,
+  Logout,
+  CheckAuthStatus,
+  RefreshToken,
+} from "../api/auth";
 import { extractErrorMessage } from "@/utils/errorHelper";
 
 export const AuthContext = createContext(null);
@@ -47,21 +53,12 @@ export const AuthProvider = ({ children }) => {
 
     try {
       // 3. ส่งคำขอไปยัง Backend เพื่อ refresh token
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACK_END_URL}/api/auth/refresh_token`,
-        {},
-        { withCredentials: true },
-      );
+      const response = await RefreshToken();
 
-      // 4. ตรวจสอบการตอบกลับ
-      if (response.status === 200 && response.data.isAuthenticated) {
-        return true; // refresh สำเร็จ
-      }
-
-      return false; // refresh ไม่สำเร็จ
+      // 4. ถ้า เป็นจริงก็ true ถ้าไม่จริง false เพื่อความปลอดภัยไว้ก่อน
+      return response.data?.isAuthenticated === true;
     } catch (error) {
-      // 5. จัดการข้อผิดพลาดในการ refresh token
-      console.error("Refresh token failed:", error);
+      // 5. โยน error ให้ handleAuth จัดการ
       handleAuthFailure(error);
       return false;
     } finally {
@@ -80,46 +77,27 @@ export const AuthProvider = ({ children }) => {
 
     try {
       // 3. ส่งคำขอไปยัง Backend เพื่อตรวจสอบสถานะการล็อกอิน
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACK_END_URL}/api/auth/status`,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const response = await CheckAuthStatus();
 
       // 4. ตรวจสอบการตอบกลับ
       if (response.data?.isAuthenticated && response.data?.user) {
-        // 4.1. ถ้ายืนยันตัวตนสำเร็จ
+        // 4.1 ถ้ายืนยันตัวตนสำเร็จ
         setIsAuthenticated(true);
         setUser(response.data.user);
         setHasRefreshTokenFailed(false);
       } else {
-        // 4.2. ถ้าไม่สำเร็จ
+        // 4.2 ถ้าไม่สำเร็จ
         handleAuthFailure();
       }
     } catch (error) {
-      // 5. จัดการข้อผิดพลาดในการตรวจสอบสถานะ
-      console.error("Auth status check failed:", error);
-
-      // 5.1. ถ้าได้รับสถานะ 401 (Unauthorized)
+      // 5 ถ้าได้รับสถานะ 401 (Unauthorized)
       if (error.response?.status === 401) {
         const refreshSuccess = await refreshToken();
 
         if (refreshSuccess) {
-          // 5.1.1. ถ้า refresh สำเร็จ ลองตรวจสอบสถานะอีกครั้ง
+          // 5.1 ถ้า refresh สำเร็จ ลองตรวจสอบสถานะอีกครั้ง
           try {
-            const retryResponse = await axios.get(
-              `${import.meta.env.VITE_BACK_END_URL}/api/auth/status`,
-              {
-                withCredentials: true,
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              },
-            );
+            const retryResponse = await CheckAuthStatus();
 
             if (
               retryResponse.data?.isAuthenticated &&
@@ -206,10 +184,7 @@ export const AuthProvider = ({ children }) => {
         // 2. เรียกฟังก์ชัน checkAuthStatus ทันที
 
         try {
-          const response = await axios.get(
-            `${import.meta.env.VITE_BACK_END_URL}/api/auth/has_token`,
-            { withCredentials: true },
-          );
+          const response = await HasToken();
 
           const { hasRefreshToken, hasAccessToken } = response.data;
 
@@ -221,7 +196,6 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
           }
         } catch (error) {
-          console.error("❌ Failed to check token existence:", err);
           setIsAuthenticated(false);
           setUser(null);
           setLoading(false);
@@ -263,27 +237,20 @@ export const AuthProvider = ({ children }) => {
   // ฟังก์ชันสำหรับ logout
   const logout = async () => {
     try {
-      // 1. ตั้งค่าสถานะต่างๆ ที่เกี่ยวข้องกับการ logout
+      //ตั้งค่าสถานะต่างๆ ที่เกี่ยวข้องกับการ logout
       setHasLoggedOut(true);
       setHasRefreshTokenFailed(true);
       setIsAuthenticated(false);
       setUser(null);
 
-      // 2. รีเซ็ต ref ต่างๆ
+      // รีเซ็ต ref ต่างๆ
       isRefreshingRef.current = false;
       isCheckingAuthRef.current = false;
 
-      // 3. ส่งคำขอ Logout ไปยัง Backend
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACK_END_URL}/api/auth/logout`,
-        {},
-        { withCredentials: true },
-      );
+      const response = await Logout();
 
       return response.data.message;
     } catch (error) {
-      // 7. จัดการข้อผิดพลาดในการ Logout
-      console.error("เกิดข้อผิดพลาดในการล็อกเอาท์", error);
       toast.error("เกิดข้อผิดพลาดในการล็อกเอาท์");
     }
   };
