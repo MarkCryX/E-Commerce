@@ -1,7 +1,7 @@
 // Routes/categoryRoutes.js
 const express = require("express");
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
-const { body, param } = require("express-validator"); // ใช้สำหรับ validation input
+const { param } = require("express-validator"); // ใช้สำหรับ validation input
 const {
   createCategory,
   readCategory,
@@ -12,16 +12,17 @@ const {
 const {
   categoryValidationRules,
 } = require("../validations/categoryValidation");
+const { apiLimiter } = require("../Middleware/rateLimiter");
 
 const router = express.Router();
 
-
 // --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 
-router.get("/category", readCategory);
+router.get("/category", apiLimiter, readCategory);
 
 router.get(
   "/category/:id",
+  apiLimiter,
   [param("id").isMongoId().withMessage("ID หมวดหมู่ไม่ถูกต้อง")],
   readCategoryById
 );

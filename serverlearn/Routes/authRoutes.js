@@ -8,14 +8,22 @@ const {
   hasToken,
 } = require("../Controllers/authController");
 const { userValidationRules } = require("../validations/userValidation");
-const { authCheck, isAdmin } = require("../Middleware/authcheck");
-const { body, param } = require("express-validator");
+const { authCheck } = require("../Middleware/authcheck");
+const {
+  loginLimiter,
+  registerLimiter,
+  apiLimiter,
+  logoutLimiter,
+  refreshTokenLimiter,
+} = require("../Middleware/rateLimiter");
+const { body } = require("express-validator");
 const router = express.Router();
 
-router.post("/auth/register", userValidationRules, register);
+router.post("/auth/register", registerLimiter, userValidationRules, register);
 
 router.post(
   "/auth/login",
+  loginLimiter,
   [
     body("email")
       .trim()
@@ -29,9 +37,9 @@ router.post(
   login
 );
 
-router.post("/auth/logout", logout); // ไม่ต้องมี authCheck เพราะเราต้องการลบ cookie ไม่ว่า token จะถูกต้องหรือไม่ก็ตาม
-router.get("/auth/status", authCheck, checkAuthStatus); 
-router.post("/auth/refresh_token", refreshAccessToken);
-router.get("/auth/has_token", hasToken);
+router.post("/auth/logout", logoutLimiter, logout);
+router.get("/auth/status",apiLimiter, authCheck, checkAuthStatus);
+router.post("/auth/refresh_token", refreshTokenLimiter, refreshAccessToken);
+router.get("/auth/has_token",apiLimiter, hasToken);
 
 module.exports = router;

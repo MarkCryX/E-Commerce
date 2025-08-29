@@ -13,12 +13,14 @@ const router = express.Router();
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
 const { param } = require("express-validator");
 const { productValidationRules } = require("../validations/productValidation");
+const { apiLimiter } = require("../Middleware/rateLimiter");
 
 // --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
 
-router.get("/products", readproducts);
+router.get("/products",apiLimiter, readproducts);
 router.get(
   "/products/:id",
+  apiLimiter,
   [param("id").isMongoId().withMessage("ID สินค้าไม่ถูกต้อง")],
   readproductById
 );

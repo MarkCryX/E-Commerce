@@ -6,7 +6,7 @@ const cookieParser = require("cookie-parser");
 const app = express();
 const connectDB = require("./config/db");
 const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+
 
 connectDB();
 
@@ -24,10 +24,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 app.use(express.json());
-// app.use(rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 100
-// }));
+
 
 app.use("/api", require("./Routes/productsRoutes"));
 app.use("/api", require("./Routes/productHighlightRoutes"));
@@ -41,5 +38,7 @@ app.use("/api", require("./Routes/categoryRoutes"));
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`Server running at http://localhost:${port}`);
+  }
 });

@@ -12,15 +12,18 @@ const {
 } = require("../Controllers/orderController");
 const router = express.Router();
 const { authCheck, isAdmin } = require("../Middleware/authcheck");
-const { body, param } = require("express-validator");
+const { param } = require("express-validator");
 const { orderValidationRules } = require("../validations/orderValidation");
+const { apiLimiter } = require("../Middleware/rateLimiter");
+
 
 // --- Public Endpoints (สำหรับผู้ใช้ทั่วไป) ---
-router.post("/orders", orderValidationRules, authCheck, createOrder);
-router.get("/orders/user-orders", authCheck, readOrders);
+router.post("/orders",apiLimiter, orderValidationRules, authCheck, createOrder);
+router.get("/orders/user-orders",apiLimiter, authCheck, readOrders);
 
 router.get(
   "/orders/qrcode/:id",
+  apiLimiter,
   [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
   authCheck,
   genQRCodeForOrder
@@ -28,6 +31,7 @@ router.get(
 
 router.patch(
   "/orders/:id/payment-slip",
+  apiLimiter,
   [param("id").isMongoId().withMessage("ID คำสั่งซื้อไม่ถูกต้อง")],
   authCheck,
   uploadPaymentSlip
